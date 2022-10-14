@@ -242,9 +242,21 @@ class UEncoder(nn.Module):
         self.down4 = UNetDown(256, 512, dropout=0.5)
         self.down5 = UNetDown(512, 512, dropout=0.5)
         self.down6 = UNetDown(512, 512, dropout=0.5, normalize=False)
-    
+        
         if add_final_conv:
             self.conv1 = nn.Conv2d(512, nz, 4, 1, 0, bias=False)
+            
+        main = nn.Sequential()
+        main.add_module(self.down1)
+        main.add_module(self.down2)
+        main.add_module(self.down3)
+        main.add_module(self.down4)
+        main.add_module(self.down5)
+        main.add_module(self.down6)
+        main.add_module(self.conv1)
+        
+        self.main = main
+        
     def forward(self, input):
         d1 = self.down1(input)
         d2 = self.down2(d1)
@@ -253,22 +265,23 @@ class UEncoder(nn.Module):
         d5 = self.down5(d4)
         d6 = self.down6(d5)
         output = self.conv1(d6)
-        return d1,d2,d3,d4,d5,d6,output
+        d = d1,d2,d3,d4,d5,d6
+        return d,output
     
     
 class UDecoder(nn.Module):
     """
     UNET DECODER NETWORK
     """
-    def __init__(self, d1,d2,d3,d4,d5,d6,d7,isize=64, nz=100, nc=3, ngf=64, ngpu=1, n_extra_layers=0):
+    def __init__(self, d,isize=64, nz=100, nc=3, ngf=64, ngpu=1, n_extra_layers=0):
         super(UDecoder, self).__init__()
         
-        self.d1=d1
-        self.d2=d2
-        self.d3=d3
-        self.d4=d4
-        self.d5=d5
-        self.d6=d6
+        self.d1=d[0]
+        self.d2=d[1]
+        self.d3=d[2]
+        self.d4=d[3]
+        self.d5=d[4]
+        self.d6=d[5]
         
         self.con1 = nn.Conv2d(nz, 512, 4, 1, 0, bias=False)
         self.up1 = UNetUp(512, 512, dropout=0.5)
@@ -303,9 +316,10 @@ class UNetG(nn.Module):
         self.ndf = ndf
         self.ngpu = ngpu
         self.extralayers = extralayers
-        self.encoder1 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
-        self.decoder = UDecoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
-        self.encoder2 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        
+        self.d,self.encoder1 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        self.decoder = UDecoder(self.d, self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        _,self.encoder2 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
 
     def forward(self, x):
         latent_i = self.encoder1(x)
