@@ -17,6 +17,7 @@ import torchvision
 import torch.nn as nn
 from util import loss
 from network.model import Ganomaly
+from network.umodel import UGanomaly
 from tqdm import tqdm
 from util import color
 from util.load_data import load_data, print_parameters
@@ -32,7 +33,7 @@ def train(args):
     '''load data'''
     train_loader = load_data(args)
     '''load model'''
-    model = Ganomaly(args)
+    model = UGanomaly(args)
     ''' train epochs'''
     train_epochs(model,train_loader,args)
 
@@ -101,7 +102,7 @@ def get_args():
     #isize=64, nz=100, nc=3
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"/home/ali/GitHub_Code/YOLO/YOLOV5-old/runs/detect/f_384_2min/crops")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"C:\factory_data\2022-08-26\f_384_2min\crops")
     parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=64)
     parser.add_argument('-nz','--nz',type=int,help='compress length',default=200)
     parser.add_argument('-nc','--nc',type=int,help='num of channel',default=3)

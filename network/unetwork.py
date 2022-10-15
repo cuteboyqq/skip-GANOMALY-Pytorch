@@ -236,36 +236,44 @@ class UEncoder(nn.Module):
     """
     def __init__(self, isize=64, nz=100, nc=3, ndf=64, ngpu=1, n_extra_layers=0, add_final_conv=True):
         super(UEncoder, self).__init__()
-        self.down1 = UNetDown(nc, 64, normalize=False)
-        self.down2 = UNetDown(64, 128)
-        self.down3 = UNetDown(128, 256, dropout=0.5)
-        self.down4 = UNetDown(256, 512, dropout=0.5)
-        self.down5 = UNetDown(512, 512, dropout=0.5)
-        self.down6 = UNetDown(512, 512, dropout=0.5, normalize=False)
+        
+        self.down1 = UNetDown(nc, 32, normalize=False)
+        self.down2 = UNetDown(32, 64)
+        self.down3 = UNetDown(64, 128, dropout=0.5)
+        self.down4 = UNetDown(128,256, dropout=0.5)
+        #self.down5 = UNetDown(512, 512, dropout=0.5)
+        #self.down6 = UNetDown(512, 512, dropout=0.5, normalize=False)
         
         if add_final_conv:
-            self.conv1 = nn.Conv2d(512, nz, 4, 1, 0, bias=False)
+            self.conv1 = nn.Conv2d(256, nz, 4, 1, 0, bias=False)
             
         main = nn.Sequential()
-        main.add_module(self.down1)
-        main.add_module(self.down2)
-        main.add_module(self.down3)
-        main.add_module(self.down4)
-        main.add_module(self.down5)
-        main.add_module(self.down6)
-        main.add_module(self.conv1)
+        main.add_module('pyramid-UNetDown-{0}-{1}'.format(nc,  32),self.down1)
+        main.add_module('pyramid-UNetDown-{0}-{1}'.format(32,  64),self.down2)
+        main.add_module('pyramid-UNetDown-{0}-{1}'.format(64, 128),self.down3)
+        main.add_module('pyramid-UNetDown-{0}-{1}'.format(128,256),self.down4)
+        #main.add_module('pyramid-UNetDown-{0}-{1}'.format(512, 512),self.down5)
+        #main.add_module('pyramid-UNetDown-{0}-{1}'.format(512, 512),self.down6)
+        main.add_module('pyramid-conv-{0}-{1}'.format(256, nz),self.conv1)
         
         self.main = main
         
     def forward(self, input):
+        #print('\ninput shape:{}'.format(input.shape))
         d1 = self.down1(input)
+        #print('\nd1.shape:{}'.format(d1.shape))
         d2 = self.down2(d1)
+        #print('\nd2.shape:{}'.format(d2.shape))
         d3 = self.down3(d2)
+        #print('\nd3.shape:{}'.format(d3.shape))
         d4 = self.down4(d3)
-        d5 = self.down5(d4)
-        d6 = self.down6(d5)
-        output = self.conv1(d6)
-        d = d1,d2,d3,d4,d5,d6
+        #print('\nd4.shape:{}'.format(d4.shape))
+        #d5 = self.down5(d4)
+        #d6 = self.down6(d5)
+        
+        output = self.main(input)
+        #print('\output.shape:{}'.format(output.shape))
+        d = [d1,d2,d3,d4]
         return d,output
     
     
@@ -273,34 +281,54 @@ class UDecoder(nn.Module):
     """
     UNET DECODER NETWORK
     """
-    def __init__(self, d,isize=64, nz=100, nc=3, ngf=64, ngpu=1, n_extra_layers=0):
+    def __init__(self,isize=64, nz=100, nc=3, ngf=64, ngpu=1, n_extra_layers=0):
         super(UDecoder, self).__init__()
         
-        self.d1=d[0]
-        self.d2=d[1]
-        self.d3=d[2]
-        self.d4=d[3]
-        self.d5=d[4]
-        self.d6=d[5]
         
-        self.con1 = nn.Conv2d(nz, 512, 4, 1, 0, bias=False)
-        self.up1 = UNetUp(512, 512, dropout=0.5)
-        self.up2 = UNetUp(1024, 512, dropout=0.5)
-        self.up3 = UNetUp(1024, 256, dropout=0.5)
-        self.up4 = UNetUp(512, 128)
-        self.up5 = UNetUp(256, 64)
+        self.con1 = nn.ConvTranspose2d(nz, 256, 4, 1, 0, bias=False)
+        
+        #self.up1 = UNetUp(512, 512, dropout=0.5)
+        #self.up2 = UNetUp(1024, 512, dropout=0.5)
+        #self.up3 = UNetUp(1024, 256, dropout=0.5)
+        #self.up4 = UNetUp(512, 128)
+        #self.up5 = UNetUp(256, 64)
+        
+        
+        self.up1 = UNetUp(256, 128, dropout=0.5)
+        self.up2 = UNetUp(256,  64, dropout=0.5)
+        self.up3 = UNetUp(128,  32, dropout=0.5)
+        
+        #self.final = nn.Sequential(
+        #    nn.Upsample(scale_factor=2), nn.ZeroPad2d((1, 0, 1, 0)), nn.Conv2d(64, nc, 4, padding=1), nn.Tanh()
+        #)
         
         self.final = nn.Sequential(
-            nn.Upsample(scale_factor=2), nn.ZeroPad2d((1, 0, 1, 0)), nn.Conv2d(128, nc, 4, padding=1), nn.Tanh()
+            nn.Upsample(scale_factor=2),nn.Conv2d(64, nc, 3, padding=1), nn.Tanh()
         )
-    def forward(self, input):
+    def forward(self, input,d):
+        
+        #print('input:{}'.format(input.shape))
         c1 = self.con1(input)
-        u1 = self.up1(c1, self.d5)
-        u2 = self.up2(u1, self.d4)
-        u3 = self.up3(u2, self.d3)
-        u4 = self.up4(u3, self.d2)
-        u5 = self.up5(u4, self.d1)
-        return self.final(u5)
+        '''
+        u1 = self.up1(c1, d[4])
+        u2 = self.up2(u1, d[3])
+        u3 = self.up3(u2, d[2])
+        u4 = self.up4(u3, d[1])
+        u5 = self.up5(u4, d[0])
+        '''
+        #print('c1: {}'.format(c1.shape))
+        #print('d[2]: {}'.format(d[2].shape))
+        u1 = self.up1(c1, d[2])
+        #print('u1: {}'.format(u1.shape))
+        #print('d[1]: {}'.format(d[1].shape))
+        u2 = self.up2(u1, d[1])
+        #print('d[0]: {}'.format(d[0].shape))
+        #print('u2 :{}'.format(u2.shape))
+        u3 = self.up3(u2, d[0])
+        #print('u3 :{}'.format(u3.shape))
+        final = self.final(u3)
+        #print('final :{}'.format(final.shape))
+        return self.final(u3)
 
 
 class UNetG(nn.Module):
@@ -317,14 +345,14 @@ class UNetG(nn.Module):
         self.ngpu = ngpu
         self.extralayers = extralayers
         
-        self.d,self.encoder1 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
-        self.decoder = UDecoder(self.d, self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
-        _,self.encoder2 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        self.encoder1 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        self.decoder = UDecoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
+        self.encoder2 = UEncoder(self.isize, self.nz, self.nc, self.ngf, self.ngpu, self.extralayers)
 
     def forward(self, x):
-        latent_i = self.encoder1(x)
-        gen_imag = self.decoder(latent_i)
-        latent_o = self.encoder2(gen_imag)
+        d, latent_i = self.encoder1(x)
+        gen_imag = self.decoder(latent_i,d)
+        d, latent_o = self.encoder2(gen_imag)
         return gen_imag, latent_i, latent_o
     
 
@@ -345,7 +373,9 @@ class UNetD(nn.Module):
     def forward(self, x):
         features = self.features(x)
         features = features
+        #print('\nfeature : {}'.format(features.shape))
         classifier = self.classifier(features)
+        #print('\nclassifier : {}'.format(classifier.shape))
         classifier = classifier.view(-1, 1).squeeze(1)
 
         return classifier, features
