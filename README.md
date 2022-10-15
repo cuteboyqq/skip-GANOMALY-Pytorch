@@ -77,7 +77,8 @@ Example :
 Train dataset : factory line only
 
 dataset :factory line , top: input images, bottom: reconstruct images
-![image](https://user-images.githubusercontent.com/58428559/187598220-20d1f113-4aba-4bee-bcf8-b8b3360315e2.png)
+![image](https://user-images.githubusercontent.com/58428559/195970559-8acd1c96-fc0b-4ba8-81a4-6faf56bff6d2.png)
+
 
 dataset :factory noline , top: input images, bottom: reconstruct images
 ![image](https://user-images.githubusercontent.com/58428559/187598232-9e673923-4d87-40f3-846c-622c041f697b.png)
@@ -88,7 +89,7 @@ dataset :factory noline , top: input images, bottom: reconstruct images
 Blue : normal dataset
 
 Orange : abnormal dataset
-![image](https://user-images.githubusercontent.com/58428559/195970201-17c9cf1d-ddc8-44ef-b763-fc68bb6e0245.png)
+![image](https://user-images.githubusercontent.com/58428559/195970585-6af996b3-aa1e-4970-8a39-f62787b41645.png)
 
 ### Reference 
 [(Back to top)](#table-of-contents)
