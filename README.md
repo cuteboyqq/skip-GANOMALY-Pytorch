@@ -81,7 +81,8 @@ dataset :factory line , top: input images, bottom: reconstruct images
 
 
 dataset :factory noline , top: input images, bottom: reconstruct images
-![image](https://user-images.githubusercontent.com/58428559/187598232-9e673923-4d87-40f3-846c-622c041f697b.png)
+![image](https://user-images.githubusercontent.com/58428559/195970601-3a851ecf-5169-4992-8f80-d78c76a618c7.png)
+
 
 ### Lose-value-distribution
 [(Back to top)](#table-of-contents)
