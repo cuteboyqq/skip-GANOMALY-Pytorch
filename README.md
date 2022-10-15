@@ -27,16 +27,9 @@ pip install -r requirements.txt
 ### implement 
 [(Back to top)](#table-of-contents)
 
-1. Encoder--Decoder--Encoder
+1. Encoder-Decoder use Unet
 
-2. loss function
-
-3. Encoder/Decoder : Use paper network, conv--batchnorm--leakyrelu
-
-4. Discriminator (2022/08/30 updated)
-
-![image](https://user-images.githubusercontent.com/58428559/187453543-ea807f75-46ba-443f-ae89-a19bb8151f0d.png)
-
+![image](https://user-images.githubusercontent.com/58428559/195968483-e7b102f1-6071-4e70-8f18-0c4b749eda30.png)
 
 
 ### Train-on-custom-dataset
