@@ -1,4 +1,4 @@
-### GANomaly-Pytorch
+### skip-GANomaly-Pytorch
 [(Back to top)](#table-of-contents)
 
 Generator +  Discriminator model 
