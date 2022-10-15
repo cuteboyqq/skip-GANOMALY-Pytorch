@@ -31,6 +31,7 @@ pip install -r requirements.txt
 
 ![image](https://user-images.githubusercontent.com/58428559/195968483-e7b102f1-6071-4e70-8f18-0c4b749eda30.png)
 
+![image](https://user-images.githubusercontent.com/58428559/195968671-a287ecae-67b0-41e2-9bfc-7283014c8c3b.png)
 
 ### Train-on-custom-dataset
 [(Back to top)](#table-of-contents)
