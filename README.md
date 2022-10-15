@@ -10,7 +10,7 @@ Generator +  Discriminator model
 
 Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README. -->
 
-- [GANomaly-Pytorch](#GANomaly-Pytorch)
+- [skip-GANomaly-Pytorch](#skip-GANomaly-Pytorch)
 - [Requirement](#Requirement)
 - [implement](#implement)
 - [Train-on-custom-dataset](#Train-on-custom-dataset)
