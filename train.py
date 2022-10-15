@@ -108,7 +108,7 @@ def get_args():
     parser.add_argument('-nc','--nc',type=int,help='num of channel',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"/home/ali/AutoEncoder-Pytorch/runs/train")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train")
     parser.add_argument('-weights','--weights',help='save model dir',default='')
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=30)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
