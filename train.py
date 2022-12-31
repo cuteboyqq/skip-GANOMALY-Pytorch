@@ -52,6 +52,8 @@ def train_epochs(model,train_loader,args):
     
     for epoch in range(1, args.epoch+1):
         train_loss = 0.0
+        G_loss = 0
+        D_loss = 0
         pbar = tqdm(train_loader)
         for images, _  in pbar: 
             images = images.to(device)
@@ -59,22 +61,26 @@ def train_epochs(model,train_loader,args):
             outputs = model(images)
             error_g, error_d, fake_img, model_g, model_d = outputs
             loss = error_g + error_d
-         
-            bar_str = ' epoch:{} loss:{} error_g:{} error_d:{}'.format(epoch,loss,error_g,error_d)
+            
+            bar_str = ' epoch:{} loss_g:{:.6f} loss_d:{:.6f}'.format(epoch,error_g.detach().cpu().numpy(),
+                                                                     error_d.detach().cpu().numpy())
             PREFIX = color.colorstr(bar_str)
             pbar.desc = f'{PREFIX}'
             ''' sum loss '''
-            train_loss += loss.item()*images.size(0)
+            G_loss += error_g.item()
+            D_loss += error_d.item()
             
-        train_loss = train_loss/len(train_loader)
-        print('Epoch: {} \tTraining Loss: {:.6f}'.format(epoch, train_loss))
+            avg_g_loss = G_loss/len(train_loader)
+            avg_d_loss = D_loss/len(train_loader)
+        #train_loss = train_loss/len(train_loader)
+        print('Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss))
         
-        if train_loss < _lowest_loss:
-            _lowest_loss = train_loss
+        if avg_g_loss < _lowest_loss:
+            _lowest_loss = avg_g_loss
             print('Start save model !')
             torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
             torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
-            print('save model weights complete with loss : %.3f' %(train_loss))
+            print('save model weights complete with loss : %.3f' %(avg_g_loss))
 
 def compute_loss(outputs,images,criterion):
     gen_imag, latent_i, latent_o = outputs
@@ -102,12 +108,12 @@ def get_args():
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
     parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
-    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=64)
-    parser.add_argument('-nz','--nz',type=int,help='compress length',default=200)
+    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
+    parser.add_argument('-nz','--nz',type=int,help='compress length',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channel',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-weights','--weights',help='save model dir',default='')
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=30)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
