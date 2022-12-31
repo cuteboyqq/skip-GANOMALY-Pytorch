@@ -22,8 +22,8 @@ def get_args():
     
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
-    parser.add_argument('-noramldir','--normal-dir',help='image dir',default=r"C:\factory_data\2022-08-26\f_384_2min\crops")
-    parser.add_argument('-abnoramldir','--abnormal-dir',help='image dir',default= r"C:\factory_data\2022-08-26\f_384_2min\crops_noline")
+    parser.add_argument('-noramldir','--normal-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
+    parser.add_argument('-abnoramldir','--abnormal-dir',help='image dir',default= r"C:\factory_data\2022-12-30\crops_noline")
     parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=64)
     parser.add_argument('-nz','--nz',type=int,help='compress size',default=200)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
