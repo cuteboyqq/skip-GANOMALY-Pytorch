@@ -57,12 +57,14 @@ class UGanomaly(nn.Module):
         self.times = []
         self.total_steps = 0
         self.save_test_images = True
+        self.ndf = args.ndf
+        self.ngf = args.ngf
         
 
         ##
         # Create and initialize networks.
-        self.netg = UNetG(self.isize,self.nc,self.nz).to(self.device)
-        self.netd = UNetD(self.isize,self.nc).to(self.device)
+        self.netg = UNetG(self.isize,self.nc,self.nz,self.ngf).to(self.device)
+        self.netd = UNetD(self.isize,self.nc,self.ndf).to(self.device)
         self.netg.apply(weights_init)
         self.netd.apply(weights_init)
 

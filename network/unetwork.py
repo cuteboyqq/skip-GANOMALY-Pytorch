@@ -164,8 +164,8 @@ class UDecoder(nn.Module):
         elif isize==32:
             self.con1 = nn.ConvTranspose2d(nz, ndf*4, 4, 1, 0, bias=False)
     
-            self.up1 = UNetUp(ndf*4, ndf*2, dropout=0.5) #self.down3 = UNetDown(64, 128, dropout=0.5)
-            self.up2 = UNetUp(ndf*4, 64, dropout=0.5) # self.down2 = UNetDown(32, 64)
+            self.up1 = UNetUp(ndf*4, ndf*2, dropout=0.75) #self.down3 = UNetDown(64, 128, dropout=0.5)
+            self.up2 = UNetUp(ndf*4, 64, dropout=0.75) # self.down2 = UNetDown(32, 64)
             
                
         self.final = nn.Sequential(
@@ -222,9 +222,9 @@ class UNetD(nn.Module):
     DISCRIMINATOR NETWORK
     """
 
-    def __init__(self,isize=64, nc=3):
+    def __init__(self,isize=64, nc=3, ndf=64):
         super(UNetD, self).__init__()
-        model = UEncoder(isize=isize, nz=1, nc=nc, ngf=64, ngpu=1, n_extra_layers=0)
+        model = UEncoder(isize=isize, nz=1, nc=nc, ngf=ndf, ngpu=1, n_extra_layers=0)
         layers = list(model.main.children())
 
         self.features = nn.Sequential(*layers[:-1])
