@@ -28,7 +28,7 @@ def get_args():
     parser.add_argument('-nz','--nz',type=int,help='compress size',default=200)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
-    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=1)
+    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=15)
     parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"/home/ali/GANomaly-Pytorch/model/img64_nz100/")
     parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train")
     parser.add_argument('-viewimg','--view-img',action='store_true',help='view images')
@@ -42,10 +42,10 @@ def main():
     test(args)
 
 def test(args):
-    args.view_img = False
+    args.view_img = True
     if args.view_img:
-        BATCH_SIZE_VAL = 20
-        SHOW_MAX_NUM = 4
+        BATCH_SIZE_VAL = 1
+        SHOW_MAX_NUM = 5
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
@@ -163,9 +163,9 @@ def infer(data_loader,
             os.makedirs('./runs/detect',exist_ok=True)
             plts = plot.plot_images(images,fake_img)
             if data_type=='normal':
-                file_name = 'infer_normal' + str(cnt) + '.jpg'
+                file_name = 'infer_normal_loss_' + str(loss.detach().cpu().numpy()) + "_" +  str(cnt) + '.jpg'
             else:
-                file_name = 'infer_abnormal' + str(cnt) + '.jpg'
+                file_name = 'infer_abnormal_loss_' + str(loss.detach().cpu().numpy()) + "_" + str(cnt) + '.jpg'
             file_path = os.path.join('./runs/detect',file_name)
             plts.savefig(file_path)
             cnt+=1
