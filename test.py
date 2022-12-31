@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sat Aug 27 13:51:45 2022
-
 @author: User
 """
-import matplotlib as mpl
-mpl.rcParams.update(mpl.rcParamsDefault)
 import matplotlib.pyplot as plt
 import torch
 import torchvision.transforms as transforms
@@ -18,7 +15,6 @@ import warnings
 from network.model import Ganomaly
 from network.umodel import UGanomaly
 from torch.serialization import SourceChangeWarning
-import os
 warnings.filterwarnings("ignore", category=SourceChangeWarning)
 
 def get_args():
@@ -26,16 +22,15 @@ def get_args():
     
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
-    parser.add_argument('-noramldir','--normal-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
-    parser.add_argument('-abnoramldir','--abnormal-dir',help='image dir',default= r"C:\factory_data\2022-12-30\crops_noline")
-    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
-    parser.add_argument('-nz','--nz',type=int,help='compress size',default=100)
+    parser.add_argument('-noramldir','--normal-dir',help='image dir',default=r"C:\factory_data\2022-08-26\f_384_2min\crops")
+    parser.add_argument('-abnoramldir','--abnormal-dir',help='image dir',default= r"C:\factory_data\2022-08-26\f_384_2min\crops_noline")
+    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=64)
+    parser.add_argument('-nz','--nz',type=int,help='compress size',default=200)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=1)
-    parser.add_argument('-testbatchsize','--test-batchsize',type=int,help='test batch size',default=1)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\U\32-ver2")
-    parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\U\32-ver2")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"/home/ali/GANomaly-Pytorch/model/img64_nz100/")
+    parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train")
     parser.add_argument('-viewimg','--view-img',action='store_true',help='view images')
     parser.add_argument('-train','--train',action='store_true',help='view images')
     return parser.parse_args()    
@@ -49,12 +44,12 @@ def main():
 def test(args):
     args.view_img = True
     if args.view_img:
-        BATCH_SIZE_VAL =  1
-        SHOW_MAX_NUM = 3
+        BATCH_SIZE_VAL = 20
+        SHOW_MAX_NUM = 4
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 14400
+        SHOW_MAX_NUM = 1800
         shuffle = False
     # convert data to torch.FloatTensor
    
@@ -79,7 +74,7 @@ def test(args):
     print('VAL_DATA_DIR : {}'.format(args.normal_dir))
     
     positive_loss = infer(test_loader,SHOW_MAX_NUM,model,criterion,positive_loss,
-            'normal',device,args)
+            'positive',device,args)
     
     defeat_loss = infer(defeat_loader,SHOW_MAX_NUM,model,criterion,defeat_loss,
             'defect',device,args)
@@ -134,7 +129,6 @@ def infer(data_loader,
     #with torch.no_grad():
     
     dataiter = iter(data_loader)
-    cnt=0
     while(show_num < SHOW_MAX_NUM):
         images, labels = dataiter.next()
         print('{} Start {} AE:'.format(show_num,data_type))
@@ -161,22 +155,9 @@ def infer(data_loader,
         fake_img = fake_img.view(args.batch_size, 3, args.img_size, args.img_size)
         fake_img = fake_img.cpu().detach().numpy()
         
-        '''
+       
         if args.view_img:
-            print("view img")
-            plt2 = plot.plot_images(images=images,outputs=fake_img)  
-            
-            if data_type=='normal':
-                file_name = 'infer_normal' + str(cnt) + '.jpg'
-            else:
-                file_name = 'infer_abnormal' + str(cnt) + '.jpg'
-            file_path = os.path.join('./runs/detect',file_name)
-            print('save fig')
-            
-            plt2.savefig(file_path)
-            
-            cnt+=1
-        '''
+            plot.plot_images(images,fake_img)      
         show_num+=1
     return loss_list
 
@@ -206,4 +187,3 @@ def data_loader(shuffle,VAL_DATA_DIR,args):
 if __name__=="__main__":
     
     main()
-    
