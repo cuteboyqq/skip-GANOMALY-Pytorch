@@ -32,6 +32,8 @@ def plot_images(images,outputs):
             ax.imshow(img)
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
+    
+    return plt
 
 def plot_loss_distribution(SHOW_MAX_NUM,positive_loss,defeat_loss):
     # Importing packages
