@@ -42,14 +42,14 @@ def main():
     test(args)
 
 def test(args):
-    args.view_img = True
+    args.view_img = False
     if args.view_img:
         BATCH_SIZE_VAL = 20
         SHOW_MAX_NUM = 4
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 1800
+        SHOW_MAX_NUM = 500
         shuffle = False
     # convert data to torch.FloatTensor
    
@@ -74,10 +74,10 @@ def test(args):
     print('VAL_DATA_DIR : {}'.format(args.normal_dir))
     
     positive_loss = infer(test_loader,SHOW_MAX_NUM,model,criterion,positive_loss,
-            'positive',device,args)
+            'normal',device,args)
     
     defeat_loss = infer(defeat_loader,SHOW_MAX_NUM,model,criterion,defeat_loss,
-            'defect',device,args)
+            'anomaly',device,args)
         
     if not args.view_img: 
         plot.plot_loss_distribution(SHOW_MAX_NUM,positive_loss,defeat_loss)
@@ -129,6 +129,8 @@ def infer(data_loader,
     #with torch.no_grad():
     
     dataiter = iter(data_loader)
+    cnt=1
+    
     while(show_num < SHOW_MAX_NUM):
         images, labels = dataiter.next()
         print('{} Start {} AE:'.format(show_num,data_type))
@@ -157,7 +159,16 @@ def infer(data_loader,
         
        
         if args.view_img:
-            plot.plot_images(images,fake_img)      
+            import os
+            os.makedirs('./runs/detect',exist_ok=True)
+            plts = plot.plot_images(images,fake_img)
+            if data_type=='normal':
+                file_name = 'infer_normal' + str(cnt) + '.jpg'
+            else:
+                file_name = 'infer_abnormal' + str(cnt) + '.jpg'
+            file_path = os.path.join('./runs/detect',file_name)
+            plts.savefig(file_path)
+            cnt+=1
         show_num+=1
     return loss_list
 
