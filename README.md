@@ -92,7 +92,8 @@ Blue : normal dataset
 Orange : abnormal dataset
 
 
-![image](https://user-images.githubusercontent.com/58428559/195972746-dfd5328f-58f8-4c48-81d4-7510011f9528.png)
+![2023-01-01-skip-ganomaly-histogram](https://user-images.githubusercontent.com/58428559/210168360-f15e1bd3-8f0f-452a-9f96-07406e2c4785.jpg)
+
 
 
 ### Reference 
