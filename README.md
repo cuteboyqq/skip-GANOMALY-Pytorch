@@ -113,6 +113,8 @@ Orange : abnormal dataset
 ### Reference 
 [(Back to top)](#table-of-contents)
 
+GANomaly: Semi-Supervised Anomaly Detection via Adversarial Training
+
 https://arxiv.org/abs/1805.06725
 
 Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly Detection
