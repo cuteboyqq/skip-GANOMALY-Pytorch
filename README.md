@@ -85,6 +85,8 @@ dataset :factory noline , top: input images, bottom: reconstruct images
 
 ![infer_abnormal_loss_6 2653203_4](https://user-images.githubusercontent.com/58428559/210168379-a5db38ca-5d5d-4f74-973e-910365c40ab3.jpg)
 
+
+
 ### Lose-value-distribution
 [(Back to top)](#table-of-contents)
 
@@ -94,7 +96,10 @@ Orange : abnormal dataset
 ![loss_distribution](https://user-images.githubusercontent.com/58428559/210168369-66b80327-7dbd-44a2-a393-b267a289ca09.jpg)
 
 
+
 ![2023-01-01-skip-ganomaly-histogram](https://user-images.githubusercontent.com/58428559/210168360-f15e1bd3-8f0f-452a-9f96-07406e2c4785.jpg)
+
+
 
 
 
