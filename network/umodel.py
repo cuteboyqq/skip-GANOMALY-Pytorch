@@ -163,7 +163,7 @@ class UGanomaly(nn.Module):
         error_d = self.backward_d()
         if self.isTrain:
             self.optimizer_d.step()
-        #if self.err_d.item() < 1e-5: self.reinit_d()
+        if self.err_d.item() < 1e-5: self.reinit_d()
         
         return error_g, error_d, self.fake, self.netg, self.netd #error_d
     

@@ -44,8 +44,8 @@ class UNetDown(nn.Module):
         layers = [nn.LeakyReLU(0.2)]
         layers.append(nn.Conv2d(in_size, out_size, 4, 2, 1))
         if normalize:
-            #layers.append(nn.InstanceNorm2d(out_size))
-            layers.append(nn.BatchNorm2d(out_size))
+            layers.append(nn.InstanceNorm2d(out_size))
+            #layers.append(nn.BatchNorm2d(out_size))
         if dropout:
             layers.append(nn.Dropout(dropout))
         self.model = nn.Sequential(*layers)
@@ -57,8 +57,9 @@ class UNetDown(nn.Module):
 class UNetUp(nn.Module):
     def __init__(self, in_size, out_size, dropout=0.0):
         super(UNetUp, self).__init__()
-        #layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.InstanceNorm2d(out_size), nn.ReLU(inplace=True)]
-        layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.BatchNorm2d(out_size), nn.ReLU(inplace=True)]
+        layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.InstanceNorm2d(out_size), nn.ReLU(inplace=True)]
+        #layers = [nn.ReLU(inplace=True), nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.InstanceNorm2d(out_size)]
+        #layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.BatchNorm2d(out_size), nn.ReLU(inplace=True)]
         if dropout:
             layers.append(nn.Dropout(dropout))
 
@@ -79,7 +80,7 @@ class UEncoder(nn.Module):
         self.isize = isize
         self.down1 = UNetDown(nc, 64, normalize=False) #isize/2
         self.down2 = UNetDown(64, 128) #isize/4
-        self.down3 = UNetDown(128,256, dropout=0.5) #isize/8
+        self.down3 = UNetDown(128,256) #isize/8
         self.down4 = UNetDown(256,512, dropout=0.5) #isize/16
         if isize==128:
             self.down5 = UNetDown(512,512, dropout=0.5) #isize/32
@@ -158,8 +159,8 @@ class UDecoder(nn.Module):
             self.up3 = UNetUp(256,  64, dropout=0.5) # self.down1 = UNetDown(nc, 64, normalize=False)
         elif isize==32:
             self.con1 = nn.ConvTranspose2d(nz, 256, 4, 1, 0, bias=False)
-            self.up1 = UNetUp(256, 128, dropout=0.5) # self.down2 = UNetDown(64, 128)
-            self.up2 = UNetUp(256,  64, dropout=0.5) # self.down1 = UNetDown(nc, 64, normalize=False)
+            self.up1 = UNetUp(256, 128, dropout=0.0) # self.down2 = UNetDown(64, 128)
+            self.up2 = UNetUp(256,  64, dropout=0.0) # self.down1 = UNetDown(nc, 64, normalize=False)
                
         self.final = nn.Sequential(
             nn.Upsample(scale_factor=2),nn.Conv2d(128, nc, 3, padding=1), nn.Tanh()
