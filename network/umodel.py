@@ -28,7 +28,7 @@ class UGanomaly(nn.Module):
     """
 
     @property
-    def name(self): return 'Ganomaly'
+    def name(self): return 'skip-Ganomaly'
    
     def __init__(self,args):
                  
@@ -43,6 +43,10 @@ class UGanomaly(nn.Module):
         self.nz = args.nz
         self.nc = args.nc
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        
+        self.save_dir = args.save_dir
+        
+        
         # -- Misc attributes
         self.epoch = 0
         self.times = []
@@ -162,4 +166,130 @@ class UGanomaly(nn.Module):
         #if self.err_d.item() < 1e-5: self.reinit_d()
         
         return error_g, error_d, self.fake, self.netg, self.netd #error_d
+    
+    
+    
+    ##
+    def get_current_images(self):
+        """ Returns current images.
+        Returns:
+            [reals, fakes, fixed]
+        """
+
+        reals = self.input.data
+        fakes = self.fake.data
+        fixed = self.netg(self.fixed_input)[0].data
+
+        return reals, fakes, fixed
+    
+    
+    ##
+    def set_input(self, input:torch.Tensor, noise:bool=False):
+        """ Set input and ground truth
+        Args:
+            input (FloatTensor): Input data for batch i.
+        """
+        with torch.no_grad():
+            self.input.resize_(input[0].size()).copy_(input[0])
+            self.gt.resize_(input[1].size()).copy_(input[1])
+            self.label.resize_(input[1].size())
+
+            # Add noise to the input.
+            if noise: self.noise.data.copy_(torch.randn(self.noise.size()))
+
+            # Copy the first batch as the fixed input.
+            if self.total_steps == self.batchsize:
+                self.fixed_input.resize_(input[0].size()).copy_(input[0])
+    
+    ##
+    def load_weights(self):
+        # Load the weights of netg and netd.
+        print('>> Loading weights...')
+        try:
+            self.netg.load_state_dict(torch.load(os.path.join(self.resume, 'netG.pt')))
+            self.netd.load_state_dict(torch.load(os.path.join(self.resume, 'netD.pt')))
+        except IOError:
+            raise IOError("netG weights not found")
+        print('   Done.')
+    
+    ##
+    def test(self, test_data_loader):
+        """ Test GANomaly model.
+        Args:
+            data ([type]): Dataloader for the test set
+        Raises:
+            IOError: Model weights not found.
+        """
+        with torch.no_grad():
+            # Load the weights of netg and netd.
+            
+            self.load_weights()
+
+            self.phase = 'test'
+            
+            self.test_dataset = test_data_loader
+            scores = {}
+
+            # Create big error tensor for the test set.
+            self.an_scores = torch.zeros(size=(len(self.test_dataset)*self.batchsize,), dtype=torch.float32, device=self.device)
+            self.gt_labels = torch.zeros(size=(len(self.test_dataset)*self.batchsize,), dtype=torch.long, device=self.device)
+            self.features  = torch.zeros(size=(len(self.test_dataset)*self.batchsize, self.nz), dtype=torch.float32, device=self.device)
+
+            print("   Testing %s" % self.name)
+            self.times = []
+            self.total_steps = 0
+            epoch_iter = 0
+            pbar = tqdm(self.test_dataset,)
+            for i, data in enumerate(pbar, 0):
+                self.total_steps += self.batchsize
+                epoch_iter += self.batchsize
+                time_i = time.time()
+
+                # Forward - Pass
+                self.set_input(data)
+                self.fake, self.latent_i, self.latent_o = self.netg(self.input)
+                
+                _, self.feat_real = self.netd(self.input)
+                _, self.feat_fake = self.netd(self.fake)
+
+                # Calculate the anomaly score.
+                si = self.input.size()
+                sz = self.feat_real.size()
+                rec = (self.input - self.fake).view(si[0], si[1] * si[2] * si[3])
+                lat = (self.feat_real - self.feat_fake).view(sz[0], sz[1] * sz[2] * sz[3])
+                rec = torch.mean(torch.pow(rec, 2), dim=1)
+                lat = torch.mean(torch.pow(lat, 2), dim=1)
+                error = 0.9*rec + 0.1*lat
+
+                time_o = time.time()
+
+                self.an_scores[i*self.batchsize: i*self.batchsize + error.size(0)] = error.reshape(error.size(0))
+                self.gt_labels[i*self.batchsize: i*self.batchsize + error.size(0)] = self.gt.reshape(error.size(0))
+
+                self.times.append(time_o - time_i)
+                
+                self.save_test_images = True
+                # Save test images.
+                if self.save_test_images:
+                    dst = os.path.join(self.save_dir, 'test', 'images')
+                    if not os.path.isdir(dst): os.makedirs(dst)
+                    real, fake, _ = self.get_current_images()
+                    vutils.save_image(real, '%s/real_%03d.eps' % (dst, i+1), normalize=True)
+                    vutils.save_image(fake, '%s/fake_%03d.eps' % (dst, i+1), normalize=True)
+
+            # Measure inference time.
+            self.times = np.array(self.times)
+            self.times = np.mean(self.times[:100] * 1000)
+
+            # Scale error vector between [0, 1]
+            self.an_scores = (self.an_scores - torch.min(self.an_scores)) / \
+                             (torch.max(self.an_scores) - torch.min(self.an_scores))
+            from lib.evaluate import roc
+            auc = roc(self.gt_labels, self.an_scores)
+            
+
+            ##
+            # RETURN
+            return auc
+        
   
