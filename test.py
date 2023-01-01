@@ -3,6 +3,8 @@
 Created on Sat Aug 27 13:51:45 2022
 @author: User
 """
+import matplotlib as mpl
+mpl.rcParams.update(mpl.rcParamsDefault)
 import matplotlib.pyplot as plt
 import torch
 import torchvision.transforms as transforms
@@ -24,13 +26,13 @@ def get_args():
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
     parser.add_argument('-noramldir','--normal-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
     parser.add_argument('-abnoramldir','--abnormal-dir',help='image dir',default= r"C:\factory_data\2022-12-30\crops_noline")
-    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=64)
-    parser.add_argument('-nz','--nz',type=int,help='compress size',default=200)
+    parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
+    parser.add_argument('-nz','--nz',type=int,help='compress size',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
-    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=15)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"/home/ali/GANomaly-Pytorch/model/img64_nz100/")
-    parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train")
+    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=1)
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
+    parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-viewimg','--view-img',action='store_true',help='view images')
     parser.add_argument('-train','--train',action='store_true',help='view images')
     return parser.parse_args()    
@@ -45,7 +47,7 @@ def test(args):
     args.view_img = True
     if args.view_img:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 5
+        SHOW_MAX_NUM = 4
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
