@@ -101,12 +101,11 @@ Blue : normal dataset
 Orange : abnormal dataset
 
 
-![loss_distribution](https://user-images.githubusercontent.com/58428559/210168369-66b80327-7dbd-44a2-a393-b267a289ca09.jpg)
+![image](https://user-images.githubusercontent.com/58428559/210168535-682bd748-df50-4935-a2ef-f67ad9e3a313.png)
 
+![image](https://user-images.githubusercontent.com/58428559/210168526-8c657772-35b3-4d9d-a8ee-cf81aadc919d.png)
 
-
-![2023-01-01-skip-ganomaly-histogram](https://user-images.githubusercontent.com/58428559/210168360-f15e1bd3-8f0f-452a-9f96-07406e2c4785.jpg)
-
+![image](https://user-images.githubusercontent.com/58428559/210168496-76ade09d-28a1-4900-b68b-65be4d80496e.png)
 
 
 
