@@ -30,7 +30,7 @@ def get_args():
     parser.add_argument('-nz','--nz',type=int,help='compress size',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
-    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=15)
+    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=1)
     parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-viewimg','--view-img',action='store_true',help='view images')
@@ -44,14 +44,14 @@ def main():
     test(args)
 
 def test(args):
-    args.view_img = True
+    args.view_img = False
     if args.view_img:
         BATCH_SIZE_VAL = 1
         SHOW_MAX_NUM = 5
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 100
+        SHOW_MAX_NUM = 14400
         shuffle = False
     # convert data to torch.FloatTensor
    
@@ -68,22 +68,24 @@ def test(args):
     #device = torch.device('cpu')
     #model.eval()
     #model = ConvAutoencoder()
-    model = UGanomaly(args)
+    skip_ganomaly = UGanomaly(args)
     #model = network.NetG(isize=IMAGE_SIZE_H, nc=3, nz=100, ngf=64, ndf=64, ngpu=1, extralayers=0)
     #model = torch.load(modelPath).to(device)
     #model.load_state_dict(torch.load(modelPath))
     print('load model weight from {} success'.format(args.weights))
     print('VAL_DATA_DIR : {}'.format(args.normal_dir))
     
-    positive_loss = infer(test_loader,SHOW_MAX_NUM,model,criterion,positive_loss,
+    normal_loss = infer(test_loader,SHOW_MAX_NUM,skip_ganomaly,criterion,positive_loss,
             'normal',device,args)
     
-    defeat_loss = infer(defeat_loader,SHOW_MAX_NUM,model,criterion,defeat_loss,
+    anomaly_loss = infer(defeat_loader,SHOW_MAX_NUM,skip_ganomaly,criterion,defeat_loss,
             'anomaly',device,args)
         
-    if not args.view_img: 
-        plot.plot_loss_distribution(SHOW_MAX_NUM,positive_loss,defeat_loss)
-
+    if not args.view_img:
+        loss_list = [0.0,0.5,1.0,1.4,1.6,1.8,1.9,2.0,2.25,2.50,2.75,3.0,4.0,5.0,6.0]
+        plot.plot_loss_distribution(SHOW_MAX_NUM,normal_loss,anomaly_loss)
+        skip_ganomaly.plot_two_loss_histogram(normal_loss,anomaly_loss,"2023-01-01-skip-ganomaly-histogram")
+        skip_ganomaly.Analysis_two_list_UserDefineLossTH(normal_loss,anomaly_loss,"2023-01-01-skip-ganomaly-histogram",loss_list)
 class UnNormalize(object):
     def __init__(self, mean, std):
         self.mean = mean
