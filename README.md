@@ -77,7 +77,7 @@ Example :
 Train dataset : factory line only
 
 dataset :factory line , top: input images, bottom: reconstruct images
-![image](https://user-images.githubusercontent.com/58428559/195970559-8acd1c96-fc0b-4ba8-81a4-6faf56bff6d2.png)
+![fake_049](https://user-images.githubusercontent.com/58428559/210166403-d62eba34-8fd5-413d-bc1c-8e6eef728eaa.jpg)
 
 
 dataset :factory noline , top: input images, bottom: reconstruct images
