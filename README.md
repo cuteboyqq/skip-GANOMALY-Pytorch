@@ -93,6 +93,8 @@ dataset :factory noline , top: input images, bottom: reconstruct images
 Blue : normal dataset
 
 Orange : abnormal dataset
+
+
 ![loss_distribution](https://user-images.githubusercontent.com/58428559/210168369-66b80327-7dbd-44a2-a393-b267a289ca09.jpg)
 
 
