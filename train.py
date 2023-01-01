@@ -35,6 +35,7 @@ def train(args):
     '''load model'''
     #skip_ganomaly = UGanomaly(args)
     ganomaly = Ganomaly(args)
+    print(ganomaly)
     ''' train epochs'''
     train_epochs(ganomaly,train_loader,test_loader,args)
 
@@ -84,7 +85,11 @@ def train_epochs(model,train_loader,test_loader,args):
             avg_g_loss = G_loss/len(train_loader)
             avg_d_loss = D_loss/len(train_loader)
         #train_loss = train_loss/len(train_loader)
-        print('Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss))
+        
+        color_str = 'Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss)
+        PREFIX = color.colorstr('green', 'bold',color_str)
+        print(PREFIX)
+        #print('Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss))
         
         torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
         torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
@@ -127,15 +132,15 @@ def get_args():
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
     parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
-    parser.add_argument('-imgtestdir','--img-testdir',help='val dataset',default=r"C:\factory_data\2022-12-30\crops_2cls_small")
+    parser.add_argument('-imgtestdir','--img-testdir',help='val dataset',default=r"C:\factory_data\2022-12-30\crops_2cls")
     parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
     parser.add_argument('-nz','--nz',type=int,help='compress length',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channel',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64-ganomaly-test")
-    parser.add_argument('-weights','--weights',help='save model dir',default=r"")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64-ganomaly-continue")
+    parser.add_argument('-weights','--weights',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64-ganomaly-continue")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=30)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
     return parser.parse_args()    
