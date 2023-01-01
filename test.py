@@ -30,7 +30,7 @@ def get_args():
     parser.add_argument('-nz','--nz',type=int,help='compress size',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channels',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
-    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=1)
+    parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=15)
     parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-weights','--weights',help='model dir',default= r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
     parser.add_argument('-viewimg','--view-img',action='store_true',help='view images')
@@ -44,7 +44,7 @@ def main():
     test(args)
 
 def test(args):
-    args.view_img = False
+    args.view_img = True
     if args.view_img:
         BATCH_SIZE_VAL = 1
         SHOW_MAX_NUM = 5
