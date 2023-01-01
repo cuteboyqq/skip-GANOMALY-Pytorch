@@ -132,7 +132,7 @@ def get_args():
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
     parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
-    parser.add_argument('-weights','--weights',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64")
+    parser.add_argument('-weights','--weights',help='save model dir',default=r"")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=30)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
     return parser.parse_args()    
