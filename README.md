@@ -76,13 +76,14 @@ python test.py --nomal-dir "[test normal dataset dir]" --abnormal-dir "[test abn
 Example :
 Train dataset : factory line only
 
+
 dataset :factory line , top: input images, bottom: reconstruct images
-![fake_049](https://user-images.githubusercontent.com/58428559/210166403-d62eba34-8fd5-413d-bc1c-8e6eef728eaa.jpg)
+![infer_normal_loss_0 95653355_2](https://user-images.githubusercontent.com/58428559/210168376-8a2c1f61-85c4-4372-b93a-2506e3e593be.jpg)
 
 
 dataset :factory noline , top: input images, bottom: reconstruct images
-![image](https://user-images.githubusercontent.com/58428559/195970601-3a851ecf-5169-4992-8f80-d78c76a618c7.png)
 
+![infer_abnormal_loss_6 2653203_4](https://user-images.githubusercontent.com/58428559/210168379-a5db38ca-5d5d-4f74-973e-910365c40ab3.jpg)
 
 ### Lose-value-distribution
 [(Back to top)](#table-of-contents)
@@ -90,6 +91,7 @@ dataset :factory noline , top: input images, bottom: reconstruct images
 Blue : normal dataset
 
 Orange : abnormal dataset
+![loss_distribution](https://user-images.githubusercontent.com/58428559/210168369-66b80327-7dbd-44a2-a393-b267a289ca09.jpg)
 
 
 ![2023-01-01-skip-ganomaly-histogram](https://user-images.githubusercontent.com/58428559/210168360-f15e1bd3-8f0f-452a-9f96-07406e2c4785.jpg)
