@@ -135,6 +135,9 @@ class SAEncoder(nn.Module):
         d4 = self.down4(d3)
         if self.isize==128:
             d5 = self.down5(d4)
+            
+            d5 = self.ca4(d5) * d5
+            d5 = self.sa4(d5) * d5
         #d6 = self.down6(d5)
         
         d1 = self.ca1(d1) * d1
@@ -149,8 +152,7 @@ class SAEncoder(nn.Module):
         d4 = self.ca4(d4) * d4
         d4 = self.sa4(d4) * d4
         
-        d5 = self.ca4(d5) * d5
-        d5 = self.sa4(d5) * d5
+        
         
         
         output = self.main(input)
