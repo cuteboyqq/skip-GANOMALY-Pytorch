@@ -44,14 +44,14 @@ def main():
     test(args)
 
 def test(args):
-    args.view_img = True
+    args.view_img = False
     if args.view_img:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 4
+        SHOW_MAX_NUM = 5
         shuffle = True
     else:
         BATCH_SIZE_VAL = 1
-        SHOW_MAX_NUM = 500
+        SHOW_MAX_NUM = 100
         shuffle = False
     # convert data to torch.FloatTensor
    
@@ -170,6 +170,7 @@ def infer(data_loader,
                 file_name = 'infer_abnormal_loss_' + str(loss.detach().cpu().numpy()) + "_" + str(cnt) + '.jpg'
             file_path = os.path.join('./runs/detect',file_name)
             plts.savefig(file_path)
+            plts.show()
             cnt+=1
         show_num+=1
     return loss_list

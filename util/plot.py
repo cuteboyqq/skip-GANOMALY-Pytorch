@@ -38,6 +38,7 @@ def plot_images(images,outputs):
 def plot_loss_distribution(SHOW_MAX_NUM,positive_loss,defeat_loss):
     # Importing packages
     import matplotlib.pyplot as plt2
+    import os
     # Define data values
     x = [i for i in range(SHOW_MAX_NUM)]
     y = positive_loss
@@ -50,5 +51,9 @@ def plot_loss_distribution(SHOW_MAX_NUM,positive_loss,defeat_loss):
     # Plot another line on the same chart/graph
     #plt2.plot(x, z)
     plt2.scatter(x,y,s=1)
-    plt2.scatter(x,z,s=1) 
+    plt2.scatter(x,z,s=1)
+    os.makedirs('./runs/detect',exist_ok=True)
+    file_path = os.path.join('./runs/detect','loss_distribution.jpg')
+    
+    plt2.savefig(file_path)
     plt2.show()
