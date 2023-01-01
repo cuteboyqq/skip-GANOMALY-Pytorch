@@ -44,7 +44,7 @@ def train_epochs(model,train_loader,test_loader,args):
 
     _lowest_loss = 600.0
     
-    _lowest_auc = 100.0
+    _highest_auc = 0.0
     
     if not os.path.exists(args.save_dir):
         os.makedirs(args.save_dir)
@@ -91,12 +91,12 @@ def train_epochs(model,train_loader,test_loader,args):
         auc = model.test(test_loader)
         print('auc = {:.6f}'.format(auc))
         
-        if auc < _lowest_auc and epoch>1:
-            _lowest_auc = auc
+        if auc >= _highest_auc and epoch>1:
+            _highest_auc = auc
             print('Start save model !')
             torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
             torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
-            print('save model weights complete with auc : %.6f' %(_lowest_auc))
+            print('save model weights complete with auc : %.6f' %(_highest_auc))
 
 def compute_loss(outputs,images,criterion):
     gen_imag, latent_i, latent_o = outputs
