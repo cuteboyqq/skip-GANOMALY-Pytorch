@@ -53,6 +53,10 @@ def train_epochs(model,train_loader,test_loader,args):
     SAVE_MODEL_G_PATH = os.path.join(args.save_dir,"netG.pt")
     SAVE_MODEL_D_PATH = os.path.join(args.save_dir,"netD.pt")
     
+    
+    SAVE_BEST_MODEL_G_PATH = os.path.join(args.save_dir,"best_netG.pt")
+    SAVE_BEST_MODEL_D_PATH = os.path.join(args.save_dir,"best_netD.pt")
+    
     for epoch in range(1, args.epoch+1):
         train_loss = 0.0
         G_loss = 0
@@ -81,22 +85,18 @@ def train_epochs(model,train_loader,test_loader,args):
         #train_loss = train_loss/len(train_loader)
         print('Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss))
         
-        
-        if epoch==1:
-            print('Start save model !')
-            torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
-            torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
-            print('Done.')
+        torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
+        torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
+        print('Save Epoch {} model complete !'.format(epoch))
         #calculate auc
         auc = model.test(test_loader)
         print('auc = {:.6f}'.format(auc))
         
         if auc >= _highest_auc and epoch>1:
             _highest_auc = auc
-            print('Start save model !')
-            torch.save(model_g.state_dict(), SAVE_MODEL_G_PATH)
-            torch.save(model_d.state_dict(), SAVE_MODEL_D_PATH)
-            print('save model weights complete with auc : %.6f' %(_highest_auc))
+            torch.save(model_g.state_dict(), SAVE_BEST_MODEL_G_PATH)
+            torch.save(model_d.state_dict(), SAVE_BEST_MODEL_D_PATH)
+            print('Save best-model weights complete with auc : %.6f' %(_highest_auc))
 
 def compute_loss(outputs,images,criterion):
     gen_imag, latent_i, latent_o = outputs
