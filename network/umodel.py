@@ -206,8 +206,8 @@ class UGanomaly(nn.Module):
         # Load the weights of netg and netd.
         print('>> Loading weights...')
         try:
-            self.netg.load_state_dict(torch.load(os.path.join(self.resume, 'netG.pt')))
-            self.netd.load_state_dict(torch.load(os.path.join(self.resume, 'netD.pt')))
+            self.netg.load_state_dict(torch.load(os.path.join(self.save_dir, 'netG.pt')))
+            self.netd.load_state_dict(torch.load(os.path.join(self.save_dir, 'netD.pt')))
         except IOError:
             raise IOError("netG weights not found")
         print('   Done.')
