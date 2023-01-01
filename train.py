@@ -17,6 +17,7 @@ import torch.nn as nn
 from util import loss
 from network.model import Ganomaly
 from network.umodel import UGanomaly
+from network.SAmodel import SAGanomaly
 from tqdm import tqdm
 from util import color
 from util.load_data import load_data, print_parameters
@@ -34,10 +35,11 @@ def train(args):
     test_loader = load_data(args,train=False,test=True)
     '''load model'''
     #skip_ganomaly = UGanomaly(args)
-    ganomaly = Ganomaly(args)
-    print(ganomaly)
+    #ganomaly = Ganomaly(args)
+    skip_attention_ganomaly = SAGanomaly(args)
+    print(skip_attention_ganomaly)
     ''' train epochs'''
-    train_epochs(ganomaly,train_loader,test_loader,args)
+    train_epochs(skip_attention_ganomaly,train_loader,test_loader,args)
 
 
 def train_epochs(model,train_loader,test_loader,args):
@@ -103,7 +105,7 @@ def train_epochs(model,train_loader,test_loader,args):
             torch.save(model_g.state_dict(), SAVE_BEST_MODEL_G_PATH)
             torch.save(model_d.state_dict(), SAVE_BEST_MODEL_D_PATH)
             color_str = 'Save best-model weights complete with auc : {:.6f}'.format(_highest_auc)
-            PREFIX = color.colorstr('yellow', 'bold',color_str)
+            PREFIX = color.colorstr('red', 'bold',color_str)
             print(PREFIX)
             #print('Save best-model weights complete with auc : %.6f'.format(_highest_auc))
 def compute_loss(outputs,images,criterion):
@@ -139,8 +141,8 @@ def get_args():
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64-ganomaly-continue")
-    parser.add_argument('-weights','--weights',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-01\32-nz100-ngf64-ndf64-ganomaly-continue")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-02\32-nz100-ngf64-ndf64-SkipAttentionGanomaly")
+    parser.add_argument('-weights','--weights',help='save model dir',default=r"")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=30)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
     return parser.parse_args()    
