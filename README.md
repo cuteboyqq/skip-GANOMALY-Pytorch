@@ -28,13 +28,13 @@ pip install -r requirements.txt
 ### implement 
 [(Back to top)](#table-of-contents)
 
-1. Encoder-Decoder use Unet
+1. Encoder-Decoder use Unet  (image reference from paper "Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly Detection")
 
 ![image](https://user-images.githubusercontent.com/58428559/195968483-e7b102f1-6071-4e70-8f18-0c4b749eda30.png)
 
 
 ### Unet-Network
-[(Back to top)](#table-of-contents)
+[(Back to top)](#table-of-contents) (image reference from paper )
 ![image](https://user-images.githubusercontent.com/58428559/195968671-a287ecae-67b0-41e2-9bfc-7283014c8c3b.png)
 
 ### Train-on-custom-dataset
