@@ -44,8 +44,8 @@ class UNetDown(nn.Module):
         layers = [nn.LeakyReLU(0.2)]
         layers.append(nn.Conv2d(in_size, out_size, 4, 2, 1))
         if normalize:
-            layers.append(nn.InstanceNorm2d(out_size))
-        
+            #layers.append(nn.InstanceNorm2d(out_size))
+            layers.append(nn.BatchNorm2d(out_size))
         if dropout:
             layers.append(nn.Dropout(dropout))
         self.model = nn.Sequential(*layers)
@@ -57,7 +57,8 @@ class UNetDown(nn.Module):
 class UNetUp(nn.Module):
     def __init__(self, in_size, out_size, dropout=0.0):
         super(UNetUp, self).__init__()
-        layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.InstanceNorm2d(out_size), nn.ReLU(inplace=True)]
+        #layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.InstanceNorm2d(out_size), nn.ReLU(inplace=True)]
+        layers = [nn.ConvTranspose2d(in_size, out_size, 4, 2, 1), nn.BatchNorm2d(out_size), nn.ReLU(inplace=True)]
         if dropout:
             layers.append(nn.Dropout(dropout))
 
