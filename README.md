@@ -115,5 +115,7 @@ Orange : abnormal dataset
 
 https://arxiv.org/abs/1805.06725
 
+Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly Detection
+
 https://arxiv.org/pdf/1901.08954.pdf
 
