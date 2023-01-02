@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 
 ### Unet-Network
-[(Back to top)](#table-of-contents) (image reference from paper )
+[(Back to top)](#table-of-contents) (Ref from:U-Net: Convolutional Networks for Biomedical Image Segmentation )
 ![image](https://user-images.githubusercontent.com/58428559/195968671-a287ecae-67b0-41e2-9bfc-7283014c8c3b.png)
 
 ### Train-on-custom-dataset
