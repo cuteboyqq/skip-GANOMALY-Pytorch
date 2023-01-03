@@ -30,12 +30,19 @@ pip install -r requirements.txt
 
 1. Encoder-Decoder use Unet  (image reference from paper "Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly Detection")
 
-![image](https://user-images.githubusercontent.com/58428559/195968483-e7b102f1-6071-4e70-8f18-0c4b749eda30.png)
+
+![Ganomaly](https://user-images.githubusercontent.com/58428559/210389330-07c8e5c8-1990-4d5e-9fa0-54a61e71b235.png)
 
 
-### Unet-Network
+![Unet](https://user-images.githubusercontent.com/58428559/210389166-bee0d5e5-1810-41af-8628-3fd4907e3aa8.png)
+
+
+
+### Unet-CBAM-Network (Skip-Attention)
 [(Back to top)](#table-of-contents) (Ref from:U-Net: Convolutional Networks for Biomedical Image Segmentation )
-![image](https://user-images.githubusercontent.com/58428559/195968671-a287ecae-67b0-41e2-9bfc-7283014c8c3b.png)
+
+![CBAM](https://user-images.githubusercontent.com/58428559/210389295-6d2eb925-396e-4706-8ae0-dcd75de82531.png)
+
 
 ### Train-on-custom-dataset
 [(Back to top)](#table-of-contents)
