@@ -31,7 +31,8 @@ pip install -r requirements.txt
 1. Encoder-Decoder use Unet  (image reference from paper "Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly Detection")
 
 
-![image](https://user-images.githubusercontent.com/58428559/210389537-e738dbd5-be07-4dd4-8d22-dfd2deb825e5.png)
+![Ganomaly](https://user-images.githubusercontent.com/58428559/210389653-27f8b7dd-bd35-470b-908c-ebf7bd92b7ca.png)
+
 
 ![Unet](https://user-images.githubusercontent.com/58428559/210389166-bee0d5e5-1810-41af-8628-3fd4907e3aa8.png)
 
