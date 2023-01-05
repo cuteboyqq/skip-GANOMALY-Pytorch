@@ -14,6 +14,7 @@ Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README
 - [Requirement](#Requirement)
 - [implement](#implement)
 - [Unet-Network](#Unet-Network)
+- [Unet-CBAM-Network](#Unet-CBAM-Network)
 - [Train-on-custom-dataset](#Train-on-custom-dataset)
 - [Train](#Train)
 - [Test](#Test)
@@ -33,12 +34,14 @@ pip install -r requirements.txt
 
 ![Ganomaly](https://user-images.githubusercontent.com/58428559/210389653-27f8b7dd-bd35-470b-908c-ebf7bd92b7ca.png)
 
+### Unet-Network
+[(Back to top)](#table-of-contents)
 
 ![Unet](https://user-images.githubusercontent.com/58428559/210389166-bee0d5e5-1810-41af-8628-3fd4907e3aa8.png)
 
 
 
-### Unet-CBAM-Network (Skip-Attention)
+### Unet-CBAM-Network
 [(Back to top)](#table-of-contents) (Ref from:U-Net: Convolutional Networks for Biomedical Image Segmentation )
 
 ![CBAM](https://user-images.githubusercontent.com/58428559/210389295-6d2eb925-396e-4706-8ae0-dcd75de82531.png)
