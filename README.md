@@ -88,34 +88,6 @@ python train.py --img-dir "[train dataset dir]" --batch-size 64 --img-size 32 --
 ```
 python test.py --nomal-dir "[test normal dataset dir]" --abnormal-dir "[test abnormal dataset dir]" --view-img --img-size 32
 ```
-Example :
-Train dataset : factory line only
-
-
-dataset :factory line , top: input images, bottom: reconstruct images, avg_batch_normal_loss=0.99565
-
-![infer_normal_loss_0 95653355_2](https://user-images.githubusercontent.com/58428559/210168376-8a2c1f61-85c4-4372-b93a-2506e3e593be.jpg)
-
-
-dataset :factory noline , top: input images, bottom: reconstruct images, avg_batch_anomaly_loss = 6.2653
-
-![infer_abnormal_loss_6 2653203_4](https://user-images.githubusercontent.com/58428559/210168379-a5db38ca-5d5d-4f74-973e-910365c40ab3.jpg)
-
-
-
-### Lose-value-distribution
-[(Back to top)](#table-of-contents)
-
-Blue : normal dataset
-
-Orange : abnormal dataset
-
-
-![image](https://user-images.githubusercontent.com/58428559/210168535-682bd748-df50-4935-a2ef-f67ad9e3a313.png)
-
-![image](https://user-images.githubusercontent.com/58428559/210168526-8c657772-35b3-4d9d-a8ee-cf81aadc919d.png)
-
-![image](https://user-images.githubusercontent.com/58428559/210168496-76ade09d-28a1-4900-b68b-65be4d80496e.png)
 
 
 
