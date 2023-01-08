@@ -83,6 +83,7 @@ class SSAGanomaly(nn.Module):
         # Initialize input tensors.
         #Alister 2023-01-08 add input attension ground truth 
         self.input_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
+        
         self.input = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         self.label = torch.empty(size=(self.batchsize,), dtype=torch.float32, device=self.device)
         self.gt    = torch.empty(size=(self.batchsize,), dtype=torch.long, device=self.device)
@@ -125,10 +126,10 @@ class SSAGanomaly(nn.Module):
         self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
         self.err_g = self.err_g_adv * 1 + \
                      self.err_g_con * 50 - \
-                     self.err_g_ano_con * 10 + \
+                     self.err_g_ano_con * 0 + \
                      self.err_g_enc * 1 + \
-                     self.err_g_attn * 50 + \
-                     self.err_g_ano_attn * 50    
+                     (self.err_g_attn + self.err_g_ano_attn) * 50
+        
         self.err_g.backward(retain_graph=True)
         
         return self.err_g
@@ -187,30 +188,34 @@ class SSAGanomaly(nn.Module):
     # Applies image cutout augmentation https://arxiv.org/abs/1708.04552
         #print("im shape : {}".format(im.shape))
         im_mask = torch.ones(size=(self.batchsize, 1, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        #ano_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
+        #im_attn = im_attn
         if random.random() < p:
             batch_size, c, h, w = im.shape[:]
-            #print("h: {}, w: {}".format(h,w))
-            scales = [0.5] * 1 + [0.25] * 2 + [0.125] * 4 + [0.0625] * 8 + [0.03125] * 16  # image size fraction
-            for s in scales:
-                mask_h = random.randint(1, int(h * s))  # create random masks
-                mask_w = random.randint(1, int(w * s))
-        
-                # box
-                xmin = max(0, random.randint(0, w) - mask_w // 2)
-                ymin = max(0, random.randint(0, h) - mask_h // 2)
-                xmax = min(w, xmin + mask_w)
-                ymax = min(h, ymin + mask_h)
-        
-                # apply random color mask
-                im[:,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
-                im_mask[:,:,ymin:ymax, xmin:xmax] =  torch.tensor(0.0)
-                
-                # return unobscured labels
-                #if len(labels) and s > 0.03:
-                    #box = np.array([xmin, ymin, xmax, ymax], dtype=np.float32)
-                    #ioa = bbox_ioa(box, xywhn2xyxy(labels[:, 1:5], w, h))  # intersection over area
-                    #labels = labels[ioa < 0.60]  # remove >60% obscured labels
-            im_attn = self.attn(im_mask)
+            for i in range(batch_size):
+                #print("h: {}, w: {}".format(h,w))
+                scales = [0.5] * 1 + [0.25] * 2 + [0.125] * 4 + [0.0625] * 8 + [0.03125] * 16  # image size fraction
+                for s in scales:
+                    mask_h = random.randint(1, int(h * s))  # create random masks
+                    mask_w = random.randint(1, int(w * s))
+            
+                    # box
+                    xmin = max(0, random.randint(0, w) - mask_w // 2)
+                    ymin = max(0, random.randint(0, h) - mask_h // 2)
+                    xmax = min(w, xmin + mask_w)
+                    ymax = min(h, ymin + mask_h)
+            
+                    # apply random color mask
+                    im[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
+                    im_mask[i,:,ymin:ymax, xmin:xmax] =  torch.tensor(0.0)
+                    
+                    # return unobscured labels
+                    #if len(labels) and s > 0.03:
+                        #box = np.array([xmin, ymin, xmax, ymax], dtype=np.float32)
+                        #ioa = bbox_ioa(box, xywhn2xyxy(labels[:, 1:5], w, h))  # intersection over area
+                        #labels = labels[ioa < 0.60]  # remove >60% obscured labels
+            im_attn = self.attn(im_mask) #error 2023-01-09
+                    
         return im,im_attn
     
     ##
@@ -223,8 +228,11 @@ class SSAGanomaly(nn.Module):
         reals = self.input.data
         fakes = self.fake.data
         fixed = self.netg(self.fixed_input)[0].data
-
-        return reals, fakes, fixed
+        
+        reals_ano = self.anomaly.data
+        fakes_ano = self.fake_anomaly.data
+        
+        return reals, fakes, fixed, reals_ano, fakes_ano
     
     
     ##
@@ -320,10 +328,15 @@ class SSAGanomaly(nn.Module):
                 # Save test images.
                 if self.save_test_images:
                     dst = os.path.join(self.save_dir, 'test', 'images')
+                    dst_ano = os.path.join(self.save_dir, 'test_ano', 'images')
                     if not os.path.isdir(dst): os.makedirs(dst)
-                    real, fake, _ = self.get_current_images()
+                    if not os.path.isdir(dst_ano): os.makedirs(dst_ano)
+                    real, fake, _, real_ano, fake_ano = self.get_current_images()
                     vutils.save_image(real, '%s/real_%03d.eps' % (dst, i+1), normalize=True)
                     vutils.save_image(fake, '%s/fake_%03d.eps' % (dst, i+1), normalize=True)
+                    
+                    vutils.save_image(real_ano, '%s/real_ano_%03d.eps' % (dst_ano, i+1), normalize=True)
+                    vutils.save_image(fake_ano, '%s/fake_ano_%03d.eps' % (dst_ano, i+1), normalize=True)
 
             # Measure inference time.
             self.times = np.array(self.times)
