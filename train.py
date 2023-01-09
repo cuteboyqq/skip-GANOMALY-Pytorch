@@ -75,11 +75,12 @@ def train_epochs(model,train_loader,test_loader,args):
             images = images.to(device)
             '''inference'''
             outputs = model(images)
-            error_g, error_d, fake_img, model_g, model_d = outputs
+            error_g, error_d, fake_img, model_g, model_d, error_g_attn = outputs
             loss = error_g + error_d
             
-            bar_str = ' epoch:{} loss_g:{:.6f} loss_d:{:.6f}'.format(epoch,error_g.detach().cpu().numpy(),
-                                                                     error_d.detach().cpu().numpy())
+            bar_str = ' epoch:{} loss_g:{:.6f} loss_d:{:.6f} loss_attn_g:{:.6f}'.format(epoch,error_g.detach().cpu().numpy(),
+                                                                     error_d.detach().cpu().numpy(),
+                                                                     error_g_attn.detach().cpu().numpy())
             PREFIX = color.colorstr(bar_str)
             pbar.desc = f'{PREFIX}'
             ''' sum loss '''
