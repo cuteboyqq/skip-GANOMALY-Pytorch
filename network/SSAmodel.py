@@ -253,9 +253,9 @@ class SSAGanomaly(nn.Module):
                         #box = np.array([xmin, ymin, xmax, ymax], dtype=np.float32)
                         #ioa = bbox_ioa(box, xywhn2xyxy(labels[:, 1:5], w, h))  # intersection over area
                         #labels = labels[ioa < 0.60]  # remove >60% obscured labels
-            im_attn = self.attn(im_mask) #error 2023-01-09
+            #im_attn = self.attn(im_mask) #error 2023-01-09
                     
-        return im_ano,im_attn
+        return im_ano,im_mask
     
     ##
     def get_current_images(self):
