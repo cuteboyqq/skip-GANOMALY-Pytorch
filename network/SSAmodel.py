@@ -160,6 +160,7 @@ class SSAGanomaly(nn.Module):
     def forward(self,x):
         """ Forwardpass, Loss Computation and Backwardpass.
         """
+        #self.anomaly, self.anomaly_attn = self.cutout(x)
         # Forward-pass
         self.forward_g(x)
         self.forward_d(x)
@@ -182,7 +183,13 @@ class SSAGanomaly(nn.Module):
         
         return error_g, error_d, self.fake, self.netg, self.netd #error_d
     
-    
+    ##
+    def renormalize(self, tensor,minTo=0,maxTo=255):
+            minFrom= tensor.min()
+            maxFrom= tensor.max()
+            minTo = minTo
+            maxTo= maxTo
+            return minTo + (maxTo - minTo) * ((tensor - minFrom) / (maxFrom - minFrom))
     ##
     def cutout(self, im, p=1.0):
     # Applies image cutout augmentation https://arxiv.org/abs/1708.04552
@@ -206,7 +213,9 @@ class SSAGanomaly(nn.Module):
                     ymax = min(h, ymin + mask_h)
             
                     # apply random color mask
-                    im[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
+                    im_renorm = self.renormalize(im,0,255)
+                    im_renorm[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
+                    im = self.renormalize(im_renorm,0,1)
                     im_mask[i,:,ymin:ymax, xmin:xmax] =  torch.tensor(0.0)
                     
                     # return unobscured labels
@@ -227,12 +236,15 @@ class SSAGanomaly(nn.Module):
 
         reals = self.input.data
         fakes = self.fake.data
-        fixed = self.netg(self.fixed_input)[0].data
         
         reals_ano = self.anomaly.data
         fakes_ano = self.fake_anomaly.data
         
-        return reals, fakes, fixed, reals_ano, fakes_ano
+        #fixed = self.netg(self.fixed_input)[0].data
+        
+        
+        
+        return reals, fakes, reals_ano, fakes_ano
     
     
     ##
@@ -302,6 +314,8 @@ class SSAGanomaly(nn.Module):
                 self.set_input(data)
                 if Skip_SelfAttention_Ganomaly:
                     self.fake, self.latent_i, self.latent_o, self.fake_attn = self.netg(self.input)
+                    self.anomaly, self.anomaly_attn = self.cutout(self.input)
+                    self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
                 else:
                     self.fake, self.latent_i, self.latent_o = self.netg(self.input)
                 
@@ -331,7 +345,7 @@ class SSAGanomaly(nn.Module):
                     dst_ano = os.path.join(self.save_dir, 'test_ano', 'images')
                     if not os.path.isdir(dst): os.makedirs(dst)
                     if not os.path.isdir(dst_ano): os.makedirs(dst_ano)
-                    real, fake, _, real_ano, fake_ano = self.get_current_images()
+                    real, fake, real_ano, fake_ano = self.get_current_images()
                     vutils.save_image(real, '%s/real_%03d.eps' % (dst, i+1), normalize=True)
                     vutils.save_image(fake, '%s/fake_%03d.eps' % (dst, i+1), normalize=True)
                     
