@@ -140,11 +140,12 @@ class SSAGanomaly(nn.Module):
         #self.err_g_ano_con = self.l_con(self.anomaly, self.fake_anomaly)
         self.err_g_enc = self.l_enc(self.latent_o, self.latent_i)
         self.err_g_attn = self.l_attn(self.input_attn, self.fake_attn)
-        #self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
-        self.err_g = self.err_g_adv * 5 + \
+        #not added , the last try to train model
+        self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
+        self.err_g = self.err_g_adv * 1 + \
                      self.err_g_con * 50 + \
                      self.err_g_enc * 1 + \
-                     self.err_g_attn * 10
+                     (self.err_g_attn + self.err_g_ano_attn) * 5
                      #(self.err_g_attn + self.err_g_ano_attn) * 10
         
         self.err_g.backward(retain_graph=True)
@@ -242,7 +243,8 @@ class SSAGanomaly(nn.Module):
                     # apply random color mask
                     #im_renorm = self.renormalize(im,0,255)
                     #im_renorm[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
-                    im_ano[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.random())
+                    for j in range(c):
+                        im_ano[i,j,ymin:ymax, xmin:xmax] = torch.tensor(random.random())
                     #im = self.renormalize(im_renorm,0,1)
                     im_mask[i,:,ymin:ymax, xmin:xmax] =  torch.tensor(0.0)
                     
@@ -271,11 +273,13 @@ class SSAGanomaly(nn.Module):
         reals_attn = self.input_attn.data
         fakes_attn = self.fake_attn.data
         
+        reals_ano_attn = self.anomaly_attn.data
+        fakes_ano_attn = self.fake_anomaly_attn.data
         #fixed = self.netg(self.fixed_input)[0].data
         
         
         
-        return reals, fakes, reals_ano, fakes_ano, reals_attn, fakes_attn
+        return reals, fakes, reals_ano, fakes_ano, reals_attn, fakes_attn, reals_ano_attn, fakes_ano_attn
     
     
     ##
@@ -377,10 +381,12 @@ class SSAGanomaly(nn.Module):
                     dst = os.path.join(self.save_dir, 'test', 'images')
                     dst_attn = os.path.join(self.save_dir, 'test_attn', 'images')
                     dst_ano = os.path.join(self.save_dir, 'test_ano', 'images')
+                    dst_ano_attn = os.path.join(self.save_dir, 'test_ano_attn', 'images')
                     if not os.path.isdir(dst): os.makedirs(dst)
                     if not os.path.isdir(dst_attn): os.makedirs(dst_attn)
                     if not os.path.isdir(dst_ano): os.makedirs(dst_ano)
-                    real, fake, real_ano, fake_ano, reals_attn, fakes_attn = self.get_current_images()
+                    if not os.path.isdir(dst_ano_attn): os.makedirs(dst_ano_attn)
+                    real, fake, real_ano, fake_ano, reals_attn, fakes_attn, reals_ano_attn, fakes_ano_attn = self.get_current_images()
                     vutils.save_image(real, '%s/real_%03d.eps' % (dst, i+1), normalize=True)
                     vutils.save_image(fake, '%s/fake_%03d.eps' % (dst, i+1), normalize=True)
                     
@@ -389,6 +395,9 @@ class SSAGanomaly(nn.Module):
                     
                     vutils.save_image(reals_attn, '%s/reals_attn_%03d.eps' % (dst_attn, i+1), normalize=True)
                     vutils.save_image(fakes_attn, '%s/fakes_attn_%03d.eps' % (dst_attn, i+1), normalize=True)
+                    
+                    vutils.save_image(reals_ano_attn, '%s/reals_ano_attn_%03d.eps' % (dst_ano_attn, i+1), normalize=True)
+                    vutils.save_image(fakes_ano_attn, '%s/fakes_ano_attn_%03d.eps' % (dst_ano_attn, i+1), normalize=True)
 
             # Measure inference time.
             self.times = np.array(self.times)
