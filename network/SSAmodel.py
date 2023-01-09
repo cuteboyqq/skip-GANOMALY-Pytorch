@@ -85,6 +85,8 @@ class SSAGanomaly(nn.Module):
         self.input_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
         
         self.input = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        self.input_2 = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        self.x2 = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         self.label = torch.empty(size=(self.batchsize,), dtype=torch.float32, device=self.device)
         self.gt    = torch.empty(size=(self.batchsize,), dtype=torch.long, device=self.device)
         self.fixed_input = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
@@ -103,7 +105,8 @@ class SSAGanomaly(nn.Module):
         """ Forward propagate through netG
         """
         self.fake, self.latent_i, self.latent_o, self.fake_attn = self.netg(x)
-        self.anomaly, self.anomaly_attn = self.cutout(x)
+        self.x2.copy_(x)
+        self.anomaly, self.anomaly_attn = self.cutout(self.x2)
         self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
 
     ##
@@ -194,6 +197,8 @@ class SSAGanomaly(nn.Module):
     def cutout(self, im, p=1.0):
     # Applies image cutout augmentation https://arxiv.org/abs/1708.04552
         #print("im shape : {}".format(im.shape))
+        #im_ano = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        #im_ano.resize_(im[0].size()).copy_(im[0])
         im_mask = torch.ones(size=(self.batchsize, 1, self.isize, self.isize), dtype=torch.float32, device=self.device)
         #ano_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
         #im_attn = im_attn
@@ -213,9 +218,10 @@ class SSAGanomaly(nn.Module):
                     ymax = min(h, ymin + mask_h)
             
                     # apply random color mask
-                    im_renorm = self.renormalize(im,0,255)
-                    im_renorm[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
-                    im = self.renormalize(im_renorm,0,1)
+                    #im_renorm = self.renormalize(im,0,255)
+                    #im_renorm[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.randint(64, 191))
+                    im[i,:,ymin:ymax, xmin:xmax] = torch.tensor(random.random())
+                    #im = self.renormalize(im_renorm,0,1)
                     im_mask[i,:,ymin:ymax, xmin:xmax] =  torch.tensor(0.0)
                     
                     # return unobscured labels
@@ -255,6 +261,7 @@ class SSAGanomaly(nn.Module):
         """
         with torch.no_grad():
             self.input.resize_(input[0].size()).copy_(input[0])
+            self.input_2.resize_(input[0].size()).copy_(input[0])
             self.gt.resize_(input[1].size()).copy_(input[1])
             self.label.resize_(input[1].size())
 
@@ -314,7 +321,7 @@ class SSAGanomaly(nn.Module):
                 self.set_input(data)
                 if Skip_SelfAttention_Ganomaly:
                     self.fake, self.latent_i, self.latent_o, self.fake_attn = self.netg(self.input)
-                    self.anomaly, self.anomaly_attn = self.cutout(self.input)
+                    self.anomaly, self.anomaly_attn = self.cutout(self.input_2)
                     self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
                 else:
                     self.fake, self.latent_i, self.latent_o = self.netg(self.input)
