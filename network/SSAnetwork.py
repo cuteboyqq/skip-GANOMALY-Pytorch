@@ -301,15 +301,19 @@ class SSANetD(nn.Module):
 
     def __init__(self,isize=64, nc=3):
         super(SSANetD, self).__init__()
-        model = SSAEncoder(isize=isize, nz=1, nc=nc, ndf=64, ngpu=1, n_extra_layers=0)
-        layers = list(model.main.children())
-
+        #model = SSAEncoder(isize=isize, nz=1, nc=nc, ndf=64, ngpu=1, n_extra_layers=0)
+        model_fusion = SSAEncoder(isize=isize, nz=1, nc=nc, ndf=64, ngpu=1, n_extra_layers=0)
+        #self.concat = nn.cat(dim=0)
+        #layers = list(model.main.children())
+        layers = list(model_fusion.main.children())
         self.features = nn.Sequential(*layers[:-1])
         self.classifier = nn.Sequential(layers[-1])
         self.classifier.add_module('Sigmoid', nn.Sigmoid())
-
-    def forward(self, x):
-        features = self.features(x)
+        #self.input_attn = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
+    def forward(self, x, attention):
+        fusion = torch.cat((x,attention),1)
+        features = self.features(fusion)
+        #features = self.features(x)
         features = features
         #print('\nfeature : {}'.format(features.shape))
         classifier = self.classifier(features)

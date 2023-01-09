@@ -59,7 +59,7 @@ class SSAGanomaly(nn.Module):
         ##
         # Create and initialize networks.
         self.netg = SSANetG(self.isize,self.nc,self.nz).to(self.device)
-        self.netd = SSANetD(self.isize,self.nc).to(self.device)
+        self.netd = SSANetD(self.isize,self.nc*2).to(self.device)
         self.netg.apply(weights_init)
         self.netd.apply(weights_init)
 
@@ -110,32 +110,41 @@ class SSAGanomaly(nn.Module):
         self.x2.copy_(x)
         self.anomaly, self.anomaly_attn = self.cutout(self.x2)
         self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
-        
         #return self.fake_attn, self.anomaly_attn, self.fake_anomaly_attn
 
     ##
     def forward_d(self,x):
         """ Forward propagate through netD
         """
-        self.pred_real, self.feat_real = self.netd(x)
-        self.pred_fake, self.feat_fake = self.netd(self.fake.detach())
+        
+        
+        #self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
+        
+        self.pred_real, self.feat_real = self.netd(x,self.input_attn)
+        self.pred_fake, self.feat_fake = self.netd(self.fake.detach(),self.fake_attn.detach())
+        
+        self.pred_ano_real, self.feat_ano_real = self.netd(self.anomaly,self.anomaly_attn)
+        self.pred_ano_fake, self.feat_ano_fake = self.netd(self.fake_anomaly.detach(),self.fake_anomaly_attn.detach())
+        
+        #self.pred_real, self.feat_real = self.netd(x)
+        #self.pred_fake, self.feat_fake = self.netd(self.fake.detach())
     
     
     ##
     def backward_g(self,x):
         """ Backpropagate through netG
         """
-        self.err_g_adv = self.l_adv(self.netd(x)[1], self.netd(self.fake)[1])
+        self.err_g_adv = self.l_adv(self.netd(x,self.input_attn)[1], self.netd(self.fake,self.fake_attn)[1])
         self.err_g_con = self.l_con(self.fake, x)
-        self.err_g_ano_con = self.l_con(self.anomaly, self.fake_anomaly)
+        #self.err_g_ano_con = self.l_con(self.anomaly, self.fake_anomaly)
         self.err_g_enc = self.l_enc(self.latent_o, self.latent_i)
         self.err_g_attn = self.l_attn(self.input_attn, self.fake_attn)
-        self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
+        #self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
         self.err_g = self.err_g_adv * 1 + \
-                     self.err_g_con * 50 - \
-                     self.err_g_ano_con * 0 + \
+                     self.err_g_con * 50 + \
                      self.err_g_enc * 1 + \
-                     (self.err_g_attn + self.err_g_ano_attn) * 10
+                     self.err_g_attn * 10
+                     #(self.err_g_attn + self.err_g_ano_attn) * 10
         
         self.err_g.backward(retain_graph=True)
         
@@ -148,11 +157,19 @@ class SSAGanomaly(nn.Module):
         # Real - Fake Loss
         #print(len(self.pred_real))
         #print(len(self.real_label))
+        #self.err_d_real = self.l_bce(self.pred_real, self.real_label)
+        #self.err_d_fake = self.l_bce(self.pred_fake, self.fake_label)
+        
+        
         self.err_d_real = self.l_bce(self.pred_real, self.real_label)
         self.err_d_fake = self.l_bce(self.pred_fake, self.fake_label)
-
+        
+        
+        self.err_d_ano_real = self.l_bce(self.pred_ano_real, self.real_label)
+        self.err_d_ano_fake = self.l_bce(self.pred_ano_fake, self.fake_label)
         # NetD Loss & Backward-Pass
-        self.err_d = (self.err_d_real + self.err_d_fake) * 0.5
+        self.err_d = (self.err_d_real + self.err_d_fake) * 0.5 +\
+            (self.err_d_ano_real + self.err_d_ano_fake) * 0.5
         self.err_d.backward()
         
         return self.err_d
@@ -188,7 +205,7 @@ class SSAGanomaly(nn.Module):
             self.optimizer_d.step()
         #if self.err_d.item() < 1e-5: self.reinit_d()
         
-        return error_g, error_d, self.fake, self.netg, self.netd, self.err_g_attn, self.err_g_ano_attn#error_d
+        return error_g, error_d, self.fake, self.netg, self.netd, self.err_g_attn
     
     ##
     def renormalize(self, tensor,minTo=0,maxTo=255):
@@ -333,9 +350,9 @@ class SSAGanomaly(nn.Module):
                     self.fake_anomaly, self.latent_i_anomaly, self.latent_o_anomaly, self.fake_anomaly_attn = self.netg(self.anomaly)
                 else:
                     self.fake, self.latent_i, self.latent_o = self.netg(self.input)
-                
-                _, self.feat_real = self.netd(self.input)
-                _, self.feat_fake = self.netd(self.fake)
+                #Alister 2023-01-09
+                _, self.feat_real = self.netd(self.input,self.input_attn)
+                _, self.feat_fake = self.netd(self.fake,self.fake_attn)
 
                 # Calculate the anomaly score.
                 si = self.input.size()
