@@ -261,10 +261,11 @@ class SSADecoder(nn.Module):
         elif self.isize==32:
             u1 = self.up1(c1, d[1])
             u2 = self.up2(u1, d[0])
-            final_feature = self.final_feature(u2)
-            final_attn = self.attn1(final_feature)
+            final_fea = self.final_feature(u2)
+            final = self.tanh(final_fea)
+            final_attn = self.attn1(final_fea)
             #print('final_attn {}'.format(final_attn.shape))
-            final = self.tanh(final_feature)
+            
         return final,final_attn
 
 
