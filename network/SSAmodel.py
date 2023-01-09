@@ -134,13 +134,14 @@ class SSAGanomaly(nn.Module):
     def backward_g(self,x):
         """ Backpropagate through netG
         """
-        self.err_g_adv = self.l_adv(self.netd(x,self.input_attn)[1], self.netd(self.fake,self.fake_attn)[1])
+        self.err_g_adv = self.l_adv(self.netd(x,self.input_attn)[1], self.netd(self.fake,self.fake_attn)[1]) +\
+                        self.l_adv(self.netd(self.anomaly,self.anomaly_attn)[1], self.netd(self.fake_anomaly,self.fake_anomaly_attn)[1])
         self.err_g_con = self.l_con(self.fake, x)
         #self.err_g_ano_con = self.l_con(self.anomaly, self.fake_anomaly)
         self.err_g_enc = self.l_enc(self.latent_o, self.latent_i)
         self.err_g_attn = self.l_attn(self.input_attn, self.fake_attn)
         #self.err_g_ano_attn = self.l_attn(self.anomaly_attn, self.fake_anomaly_attn)
-        self.err_g = self.err_g_adv * 1 + \
+        self.err_g = self.err_g_adv * 5 + \
                      self.err_g_con * 50 + \
                      self.err_g_enc * 1 + \
                      self.err_g_attn * 10
