@@ -13,19 +13,21 @@ import numpy as np
 
 class Self_Attn(nn.Module):
     """ Self attention Layer"""
-    def __init__(self,in_dim,activation):
+    def __init__(self,in_dim,div,activation):
         super(Self_Attn,self).__init__()
         self.chanel_in = in_dim
         self.activation = activation
         
-        self.query_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//1 , kernel_size= 1)
-        self.key_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//1 , kernel_size= 1)
+        self.query_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//div , kernel_size= 1)
+        self.key_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim//div , kernel_size= 1)
         self.value_conv = nn.Conv2d(in_channels = in_dim , out_channels = in_dim , kernel_size= 1)
         
         self.gamma = nn.Parameter(torch.zeros(1))
         #self.gamma = nn.Parameter()
 
         self.softmax  = nn.Softmax(dim=-1) #
+        
+        self.att_conv = nn.Conv2d(in_channels = in_dim*2 , out_channels = 3 , kernel_size= 1)
     def forward(self,x):
         """
             inputs :
@@ -45,12 +47,12 @@ class Self_Attn(nn.Module):
         out = torch.bmm(proj_value,attention.permute(0,2,1) )
         out = out.view(m_batchsize,C,width,height)
         
+        out = self.gamma*out + x
         
-        #out = self.gamma*out + x
+        
         #attention = self.gamma*attention
-        #out = out + x
-        out = self.gamma*out
-        return out
-        #return out, attention
+        self_att = self.gamma*out
+        #return out
+        return out, self_att
     
         

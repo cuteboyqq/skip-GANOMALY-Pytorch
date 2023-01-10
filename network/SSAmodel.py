@@ -55,7 +55,7 @@ class SSAGanomaly(nn.Module):
         
         
         #Alister 2023-01-09
-        self.attn = Self_Attn( 3, 'relu').to(self.device)
+        self.attn = Self_Attn( 3, 1,'relu').to(self.device)
         ##
         # Create and initialize networks.
         self.netg = SSANetG(self.isize,self.nc,self.nz).to(self.device)
@@ -84,7 +84,7 @@ class SSAGanomaly(nn.Module):
         #Alister 2023-01-08 add input attension ground truth 
         
         #self.input_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
-        self.input_attn = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        self.input_attn = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         
         self.input = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         self.input_2 = torch.empty(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
@@ -145,7 +145,7 @@ class SSAGanomaly(nn.Module):
         self.err_g = self.err_g_adv * 1 + \
                      self.err_g_con * 50 + \
                      self.err_g_enc * 1 + \
-                     (self.err_g_attn + self.err_g_ano_attn) * 5
+                     (self.err_g_attn + self.err_g_ano_attn) * 10
                      #(self.err_g_attn + self.err_g_ano_attn) * 10
         
         self.err_g.backward(retain_graph=True)
@@ -207,7 +207,7 @@ class SSAGanomaly(nn.Module):
             self.optimizer_d.step()
         #if self.err_d.item() < 1e-5: self.reinit_d()
         
-        return error_g, error_d, self.fake, self.netg, self.netd, self.err_g_attn
+        return error_g, error_d, self.fake, self.netg, self.netd, self.err_g_attn, self.err_g_ano_attn
     
     ##
     def renormalize(self, tensor,minTo=0,maxTo=255):
@@ -222,8 +222,9 @@ class SSAGanomaly(nn.Module):
         #print("im shape : {}".format(im.shape))
         im_ano = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         im_ano.copy_(im)
+        #im_mask = torch.ones(size=(self.batchsize, 1, self.isize, self.isize), dtype=torch.float32, device=self.device)
+        ano_attn = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
         im_mask = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
-        #ano_attn = torch.ones(size=(self.batchsize, self.isize*self.isize, self.isize*self.isize), dtype=torch.float32, device=self.device)
         #im_attn = im_attn
         if random.random() < p:
             batch_size, c, h, w = im.shape[:]
@@ -254,7 +255,7 @@ class SSAGanomaly(nn.Module):
                         #ioa = bbox_ioa(box, xywhn2xyxy(labels[:, 1:5], w, h))  # intersection over area
                         #labels = labels[ioa < 0.60]  # remove >60% obscured labels
             #im_attn = self.attn(im_mask) #error 2023-01-09
-                    
+        #im_mask = im_mask.view(self.batchsize, self.isize*self.isize, self.isize*self.isize)
         return im_ano,im_mask
     
     ##

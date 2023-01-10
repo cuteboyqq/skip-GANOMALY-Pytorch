@@ -103,7 +103,10 @@ class UNetUp(nn.Module):
 
     def forward(self, x, skip_input):
         x = self.model(x)
-        x = torch.cat((x, skip_input), 1)
+        if not skip_input==None:
+            x = torch.cat((x, skip_input), 1)
+        else:
+            x = x 
 
         return x
 
@@ -228,18 +231,27 @@ class SSADecoder(nn.Module):
             self.con1 = nn.ConvTranspose2d(nz, 256, 4, 1, 0, bias=False)
             self.up1 = UNetUp(256, 128, dropout=0.0) # self.down2 = UNetDown(64, 128)
             self.up2 = UNetUp(256,  64, dropout=0.0) # self.down1 = UNetDown(nc, 64, normalize=False)
-               
+            #self.up3 = UNetUp(128,  64, dropout=0.0) 
+            self.up3 = nn.Sequential(nn.Upsample(scale_factor=2),nn.Conv2d(128, 3, 3, padding=1))
         '''
         self.final = nn.Sequential(
             nn.Upsample(scale_factor=2),nn.Conv2d(128, nc, 3, padding=1), nn.Tanh()
         )
         '''
-        self.final_feature = nn.Sequential(
-            nn.Upsample(scale_factor=2),nn.Conv2d(128, nc, 3, padding=1)
+        self.tanh = nn.Tanh()
+        
+        self.feature1 = nn.Sequential(
+            nn.Upsample(scale_factor=2),nn.Conv2d(128, 64, 3, padding=1)
         )
         
-        self.tanh = nn.Tanh()
-        self.attn1 = Self_Attn( 3, 'relu')
+        
+        #self.tanh = nn.Tanh()
+        self.attn1 = Self_Attn( 256,8, 'relu')
+        self.attn2 = Self_Attn( 128,8, 'relu')
+        self.attn3 = Self_Attn(  64,8, 'relu')
+        self.attn4 = Self_Attn(   3,1, 'relu')
+        
+        self.final_conv = nn.Conv2d(3,  1,  3,  padding=1) 
         #self.attn2 = Self_Attn( 128, 'relu')
         #self.attn3 = Self_Attn( 256, 'relu')
         #self.attn4 = Self_Attn( 512, 'relu')
@@ -259,14 +271,20 @@ class SSADecoder(nn.Module):
             u3 = self.up3(u2, d[0])
             final = self.final(u3)
         elif self.isize==32:
-            u1 = self.up1(c1, d[1])
-            u2 = self.up2(u1, d[0])
-            final_fea = self.final_feature(u2)
-            final = self.tanh(final_fea)
-            final_attn = self.attn1(final_fea)
-            #print('final_attn {}'.format(final_attn.shape))
+            u1 = self.up1(c1, d[1]) #out:8x8, c:256
+            u1a,atn1 = self.attn1(u1)
+            u2 = self.up2(u1a, d[0]) #out:16x16 ,c:128
+            u2a,atn2 = self.attn2(u2)
             
-        return final,final_attn
+            u3 = self.up3(u2a) #u3:32x32 ,c:3
+           
+            final = self.tanh(u3)
+            
+            #out = self.final_conv(final)
+            
+            out_feature, atn3 = self.attn4(u3)
+            #print('final_attn {}'.format(final_attn.shape))            
+        return final, atn3
 
 
 class SSANetG(nn.Module):
@@ -311,6 +329,9 @@ class SSANetD(nn.Module):
         self.classifier.add_module('Sigmoid', nn.Sigmoid())
         #self.input_attn = torch.ones(size=(self.batchsize, 3, self.isize, self.isize), dtype=torch.float32, device=self.device)
     def forward(self, x, attention):
+        #b,N,N = attention.size()
+        #attention = attention.view(b,N,32,32)
+        #print("[SSAmodelpy] attention :{}".format(attention.shape))
         fusion = torch.cat((x,attention),1)
         features = self.features(fusion)
         #features = self.features(x)
