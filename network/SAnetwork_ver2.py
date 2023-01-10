@@ -39,7 +39,6 @@ def weights_init_normal(m):
 ##############################
 #torch.nn.Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=0, dilation=1, groups=1, bias=True, padding_mode='zeros', device=None, dtype=None)
 
-
 class UNetDown(nn.Module):
     def __init__(self, in_size, out_size, normalize=True, dropout=0.0):
         super(UNetDown, self).__init__()
@@ -74,23 +73,7 @@ class UNetDown(nn.Module):
         
         return x
 
-'''
-class UNetDown(nn.Module):
-    def __init__(self, in_size, out_size, normalize=True, dropout=0.0):
-        super(UNetDown, self).__init__()
-        layers = [nn.LeakyReLU(0.2)]
-        layers.append(nn.Conv2d(in_size, out_size, 4, 2, 1))
-        if normalize:
-            layers.append(nn.InstanceNorm2d(out_size))
-        
-        if dropout:
-            layers.append(nn.Dropout(dropout))
-        self.model = nn.Sequential(*layers)
 
-    def forward(self, x):
-        return self.model(x)
-
-'''
 class UNetUp(nn.Module):
     def __init__(self, in_size, out_size, dropout=0.0):
         super(UNetUp, self).__init__()

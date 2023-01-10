@@ -65,8 +65,8 @@ class SAGanomaly(nn.Module):
             #self.iter = torch.load(os.path.join(self.resume, 'netG.pt'))['epoch']
             #self.netg.load_state_dict(torch.load(os.path.join(self.resume, 'netG.pt'))['state_dict'])
             #self.netd.load_state_dict(torch.load(os.path.join(self.resume, 'netD.pt'))['state_dict'])
-            self.netg.load_state_dict(torch.load(os.path.join(self.resume, 'netG.pt')))
-            self.netd.load_state_dict(torch.load(os.path.join(self.resume, 'netD.pt')))
+            self.netg.load_state_dict(torch.load(os.path.join(self.resume, 'best_netG.pt')))
+            self.netd.load_state_dict(torch.load(os.path.join(self.resume, 'best_netD.pt')))
             print("\tDone.\n")
 
         self.l_adv = l2_loss
@@ -294,7 +294,7 @@ class SAGanomaly(nn.Module):
         from matplotlib import pyplot
         import numpy
         import matplotlib.pyplot as plt
-        bins = numpy.linspace(0,18, 100)
+        bins = numpy.linspace(0,30, 100)
         pyplot.hist(loss_list, bins=bins, alpha=0.5, label=name)
         os.makedirs('./runs/detect',exist_ok=True)
         filename = str(name) + '.jpg'
@@ -305,15 +305,22 @@ class SAGanomaly(nn.Module):
     #https://stackoverflow.com/questions/6871201/plot-two-histograms-on-single-chart-with-matplotlib
     def plot_two_loss_histogram(self,normal_list, abnormal_list, name):
         import numpy
+        import random
         from matplotlib import pyplot
         import matplotlib.pyplot as plt
-        bins = numpy.linspace(0, 18, 100)
+        bins = numpy.linspace(0, 15, 100)
+        
+        #x = [random.gauss(3,1) for _ in range(400)]
+        #y = [random.gauss(4,2) for _ in range(400)]
+        
         pyplot.hist(normal_list, bins, alpha=0.5, label='normal')
         pyplot.hist(abnormal_list, bins, alpha=0.5, label='abnormal')
         pyplot.legend(loc='upper right')
+        
         os.makedirs('./runs/detect',exist_ok=True)
         filename = str(name) + '.jpg'
         file_path = os.path.join('./runs/detect',filename)
+        
         plt.savefig(file_path)
         pyplot.show()
         
