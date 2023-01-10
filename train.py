@@ -75,12 +75,13 @@ def train_epochs(model,train_loader,test_loader,args):
             images = images.to(device)
             '''inference'''
             outputs = model(images)
-            error_g, error_d, fake_img, model_g, model_d, error_g_attn = outputs
+            error_g, error_d, fake_img, model_g, model_d, error_g_attn, error_g_ano_attn = outputs
             loss = error_g + error_d
             
-            bar_str = ' epoch:{} loss_g:{:.6f} loss_d:{:.6f} loss_attn_g:{:.6f}'.format(epoch,error_g.detach().cpu().numpy(),
+            bar_str = ' epoch:{} loss_g:{:.6f} loss_d:{:.6f} loss_g_attn:{:.6f} error_g_ano_attn:{:.6f}'.format(epoch,error_g.detach().cpu().numpy(),
                                                                      error_d.detach().cpu().numpy(),
-                                                                     error_g_attn.detach().cpu().numpy())
+                                                                     error_g_attn.detach().cpu().numpy(),
+                                                                     error_g_ano_attn.detach().cpu().numpy())
             PREFIX = color.colorstr(bar_str)
             pbar.desc = f'{PREFIX}'
             ''' sum loss '''
@@ -136,15 +137,15 @@ def get_args():
     #isize=64, nz=100, nc=3
     parser = argparse.ArgumentParser()
     #'/home/ali/datasets/train_video/NewYork_train/train/images'
-    parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"C:\factory_data\2022-12-30\crops_line")
-    parser.add_argument('-imgtestdir','--img-testdir',help='val dataset',default=r"C:\factory_data\2022-12-30\crops_2cls")
+    parser.add_argument('-imgdir','--img-dir',help='image dir',default=r"/home/ali/datasets/factory_data/2022-12-30-4cls-cropimg/images/train")
+    parser.add_argument('-imgtestdir','--img-testdir',help='val dataset',default=r"/home/ali/datasets/factory_data/2022-12-30-4cls-cropimg/images/val")
     parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
     parser.add_argument('-nz','--nz',type=int,help='compress length',default=100)
     parser.add_argument('-nc','--nc',type=int,help='num of channel',default=3)
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:\GitHub_Code\cuteboyqq\GANomaly\skip-GANOMALY-Pytorch\runs\train\2023-01-08\32-nz100-ngf64-ndf64-Skip-SelfAttention-Ganomaly")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"/home/ali/GitHub_Code/cuteboyqq/GANomaly/skip-GANOMALY-Pytorch/runs/train/2023-01-09/32-nz100-ngf64-ndf64-Skip-SelfAttention-Ganomaly")
     parser.add_argument('-weights','--weights',help='save model dir',default=r"")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=60)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
