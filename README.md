@@ -100,7 +100,10 @@ python train.py --img-dir "[train dataset dir] or cifar10 or mnist"
 ### Test
 [(Back to top)](#table-of-contents)
 ```
-python test.py --nomal-dir "[test normal dataset dir]" --abnormal-dir "[test abnormal dataset dir]" --view-img --img-size 32
+python test.py --nomal-dir "[test normal dataset dir]" 
+               --abnormal-dir "[test abnormal dataset dir]" 
+               --view-img 
+               --img-size 32
 ```
 
 
