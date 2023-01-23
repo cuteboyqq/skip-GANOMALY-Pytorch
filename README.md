@@ -1,4 +1,4 @@
-### skip-GANomaly-Pytorch
+### skip-GANomaly-Pytorch(CIFAR10,MNIST)
 [(Back to menu)](#table-of-contents)
 
 Use skip-connection  to skip Encoder layer to Decoder layer by concatenation, the framework is based on gamonaly.
@@ -18,7 +18,7 @@ Generator +  Discriminator model
 
 Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README. -->
 
-- [skip-GANomaly-Pytorch](#skip-GANomaly-Pytorch)
+- [skip-GANomaly-Pytorch(CIFAR10,MNIST)](#skip-GANomaly-Pytorch(CIFAR10,MNIST))
 - [updated](#updated)
 - [Requirement](#Requirement)
 - [implement](#implement)
