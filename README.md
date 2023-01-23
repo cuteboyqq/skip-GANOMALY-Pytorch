@@ -1,6 +1,8 @@
 ### skip-GANomaly-Pytorch
 
-### Able to train CIFAR10, MNIST datasets (2023-01-23 updated)
+### updated
+
+1. Able to train CIFAR10, MNIST datasets (2023-01-23 updated)
 
 [(Back to menu)](#table-of-contents)
 
@@ -14,6 +16,7 @@ Generator +  Discriminator model
 Here is a sample TOC(*wow! such cool!*) that is actually the TOC for this README. -->
 
 - [skip-GANomaly-Pytorch](#skip-GANomaly-Pytorch)
+- [updated](#updated)
 - [Requirement](#Requirement)
 - [implement](#implement)
 - [Unet-Network](#Unet-Network)
