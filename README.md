@@ -93,10 +93,6 @@ python train.py --img-dir "[train dataset dir] or cifar10 or mnist"
                   --abnormal-class "airplane" 
 ```
 
-![image](https://user-images.githubusercontent.com/58428559/210168476-2cb1d156-d373-4bcc-84f4-89ef64679728.png)
-
-
-
 ### Test
 [(Back to top)](#table-of-contents)
 ```
