@@ -1,8 +1,8 @@
 ### skip-GANomaly-Pytorch
 [(Back to menu)](#table-of-contents)
 
-use skip-connection  to skip Encoder layer to Decoder layer by concatenation, the framework is based on gamonaly.
-impement skip-ganomaly and skip-attention-ganomaly, here use CBAM attention before skip Encoder layer to Decoder 
+Use skip-connection  to skip Encoder layer to Decoder layer by concatenation, the framework is based on gamonaly.
+Impement skip-ganomaly and skip-attention-ganomaly, here use CBAM attention before skip Encoder layer to Decoder 
 
 ### updated
 [(Back to menu)](#table-of-contents)
