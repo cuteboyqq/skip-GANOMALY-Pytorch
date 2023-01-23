@@ -159,7 +159,7 @@ class UDecoder(nn.Module):
             self.up3 = UNetUp(256,  64, dropout=0.5) # self.down1 = UNetDown(nc, 64, normalize=False)
         elif isize==32:
             self.con1 = nn.ConvTranspose2d(nz, 256, 4, 1, 0, bias=False)
-            self.up1 = UNetUp(256, 128, dropout=0.0) # self.down2 = UNetDown(64, 128)
+            self.up1 = UNetUp(512, 128, dropout=0.0) # self.down2 = UNetDown(64, 128)
             self.up2 = UNetUp(256,  64, dropout=0.0) # self.down1 = UNetDown(nc, 64, normalize=False)
                
         self.final = nn.Sequential(
@@ -180,9 +180,10 @@ class UDecoder(nn.Module):
             u3 = self.up3(u2, d[0])
             final = self.final(u3)
         elif self.isize==32:
-            u1 = self.up1(c1, d[1])
-            u2 = self.up2(u1, d[0])
-            final = self.final(u2)
+            c1 = torch.cat((c1, d[2]), 1) #4x4
+            u1 = self.up1(c1, d[1]) #8x8
+            u2 = self.up2(u1, d[0]) #16x16
+            final = self.final(u2) #32x32
         return final
 
 
