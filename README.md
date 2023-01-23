@@ -1,10 +1,13 @@
 ### skip-GANomaly-Pytorch
+[(Back to menu)](#table-of-contents)
+
+use skip-connection  to skip Encoder layer to Decoder layer by concatenation, the framework is based on gamonaly.
+impement skip-ganomaly and skip-attention-ganomaly, here use CBAM attention before skip Encoder layer to Decoder 
 
 ### updated
-
+[(Back to menu)](#table-of-contents)
 1. Able to train CIFAR10, MNIST datasets (2023-01-23 updated)
 
-[(Back to menu)](#table-of-contents)
 
 Generator +  Discriminator model 
 
