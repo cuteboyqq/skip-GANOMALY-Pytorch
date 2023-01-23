@@ -85,7 +85,12 @@ Custom Dataset
 ### Train
 [(Back to top)](#table-of-contents)
 ```
-python train.py --img-dir "[train dataset dir] or cifar10 or mnist" --batch-size 64 --img-size 32 --epoch 20 --model "ganomaly or skip-ganomaly or skip-attention-ganomly" --abnormal-class "airplane" 
+python train.py --img-dir "[train dataset dir] or cifar10 or mnist" 
+                  --batch-size 64 
+                  --img-size 32 
+                  --epoch 20 
+                  --model "ganomaly or skip-ganomaly or skip-attention-ganomly" 
+                  --abnormal-class "airplane" 
 ```
 
 ![image](https://user-images.githubusercontent.com/58428559/210168476-2cb1d156-d373-4bcc-84f4-89ef64679728.png)
