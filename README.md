@@ -6,7 +6,7 @@ Impement skip-ganomaly and skip-attention-ganomaly, here use CBAM attention befo
 
 ### updated
 [(Back to menu)](#table-of-contents)
-1. Able to train CIFAR10, MNIST datasets (2023-01-23 updated)
+1. Able to train CIFAR10, MNIST datasets [2023-01-23 updated]
 
 
 Generator +  Discriminator model 
