@@ -2,7 +2,7 @@
 
 ### Able to train CIFAR10, MNIST datasets (2023-01-23 updated)
 
-[(Back to top)](#table-of-contents)
+[(Back to menu)](#table-of-contents)
 
 Generator +  Discriminator model 
 
