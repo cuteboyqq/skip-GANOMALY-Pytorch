@@ -120,3 +120,7 @@ CBAM: Convolutional Block Attention Module
 
 https://arxiv.org/abs/1807.06521
 
+SAGAN: SKIP-ATTENTION GAN FOR ANOMALY DETECTION
+
+http://personal.ee.surrey.ac.uk/Personal/W.Wang/papers/LiuLZHW_ICIP_2021.pdf
+
