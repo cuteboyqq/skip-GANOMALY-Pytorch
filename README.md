@@ -47,12 +47,16 @@ below image is the whole network of GANomaly with the "skip" skill at the begini
 ### Unet-Network
 [(Back to top)](#table-of-contents)
 
+below image is the detail of Encoder-Decoder with "skip connection" skill
+
 ![Unet](https://user-images.githubusercontent.com/58428559/210389166-bee0d5e5-1810-41af-8628-3fd4907e3aa8.png)
 
 
 
 ### Unet-CBAM-Network
 [(Back to top)](#table-of-contents) 
+
+below image is similar to the Unet-Network, just do CBAM before skip connect to the Decoder layer
 
 ![CBAM](https://user-images.githubusercontent.com/58428559/210389295-6d2eb925-396e-4706-8ae0-dcd75de82531.png)
 
