@@ -116,3 +116,7 @@ Skip-GANomaly: Skip Connected and Adversarially Trained Encoder-Decoder Anomaly 
 
 https://arxiv.org/pdf/1901.08954.pdf
 
+CBAM: Convolutional Block Attention Module
+
+https://arxiv.org/abs/1807.06521
+
