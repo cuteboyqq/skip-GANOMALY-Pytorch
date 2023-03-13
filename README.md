@@ -40,6 +40,7 @@ pip install -r requirements.txt
 
 1. Encoder-Decoder use Unet
 
+below image is the whole network of GANomaly with the "skip" skill at the begining of Encoder-Decoder part
 
 ![Ganomaly](https://user-images.githubusercontent.com/58428559/210389653-27f8b7dd-bd35-470b-908c-ebf7bd92b7ca.png)
 
