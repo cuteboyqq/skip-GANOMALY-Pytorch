@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 1. Encoder-Decoder use Unet
 
-[(code)](network/umodel.py)
+[umodel.py](network/umodel.py)
 
 below image is the whole network of GANomaly with the "skip connection" skill at the begining of Encoder-Decoder part
 
@@ -51,7 +51,7 @@ below image is the whole network of GANomaly with the "skip connection" skill at
 
 below image is the detail of Encoder-Decoder with "skip connection" skill
 
-[(code)](network/unetwork.py)
+[unetwork.py](network/unetwork.py)
 
 ![Unet](https://user-images.githubusercontent.com/58428559/210389166-bee0d5e5-1810-41af-8628-3fd4907e3aa8.png)
 
@@ -59,6 +59,8 @@ below image is the detail of Encoder-Decoder with "skip connection" skill
 
 ### Unet-CBAM-Network
 [(Back to top)](#table-of-contents) 
+
+[SAnetwork.py](network/SAnetwork.py)
 
 below image is similar to the Unet-Network, just do CBAM before skip connect to the Decoder layer
 
