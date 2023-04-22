@@ -81,7 +81,7 @@ def train_epochs(model,train_loader,test_loader,args):
     
     
     #====add log file==================
-    logFileLoc = args.save_dir + args.logfile
+    logFileLoc = args.save_dir + os.sep +args.logfile
     if os.path.isfile(logFileLoc):
         logger = open(logFileLoc, 'a')
     else:
