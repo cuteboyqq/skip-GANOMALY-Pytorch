@@ -22,7 +22,7 @@ from network.SSAmodel import SSAGanomaly
 from tqdm import tqdm
 from util import color
 from util.load_data import load_data, print_parameters
-
+from matplotlib import pyplot as plt
 
 
 def main():
@@ -79,8 +79,11 @@ def train_epochs(model,train_loader,test_loader,args):
     SAVE_BEST_MODEL_G_PATH = os.path.join(args.save_dir,"best_netG.pt")
     SAVE_BEST_MODEL_D_PATH = os.path.join(args.save_dir,"best_netD.pt")
     
-    
-    #====add log file==================
+    '''
+    ======================
+    add log file
+    ===================
+    '''
     logFileLoc = args.save_dir + os.sep +args.logfile
     if os.path.isfile(logFileLoc):
         logger = open(logFileLoc, 'a')
@@ -90,7 +93,9 @@ def train_epochs(model,train_loader,test_loader,args):
         logger.write("\n%s\t\t%s\t\t%s\t\t%s\t\t%s" % ('Epoch', 'DLoss', 'GLoss', 'auc (val)', 'lr'))
     logger.flush()
     
-    
+    GlossTr_list=[]
+    auc_val_list=[]
+    epoches = []
     for epoch in range(1, args.epoch+1):
         train_loss = 0.0
         G_loss = 0
@@ -126,8 +131,12 @@ def train_epochs(model,train_loader,test_loader,args):
             G_loss += error_g.item()
             D_loss += error_d.item()
             
-            avg_g_loss = G_loss/len(train_loader)
-            avg_d_loss = D_loss/len(train_loader)
+        avg_g_loss = G_loss/len(train_loader)
+        avg_d_loss = D_loss/len(train_loader)
+            
+        GlossTr_list.append(avg_g_loss)
+        epoches.append(epoch)
+            
         #train_loss = train_loss/len(train_loader)
         
         color_str = 'Epoch: {} \t Avg_G_loss: {:.6f} Avg_D_loss: {:.6f}'.format(epoch, avg_g_loss,avg_d_loss)
@@ -140,6 +149,7 @@ def train_epochs(model,train_loader,test_loader,args):
         print('Save Epoch {} model complete !'.format(epoch))
         #calculate auc
         auc = model.test(test_loader)
+        auc_val_list.append(auc)
         print('auc = {:.6f}'.format(auc))
         
         #====write to log.txt====
@@ -154,6 +164,38 @@ def train_epochs(model,train_loader,test_loader,args):
             PREFIX = color.colorstr('red', 'bold',color_str)
             print(PREFIX)
             #print('Save best-model weights complete with auc : %.6f'.format(_highest_auc))
+        '''
+        ====================================
+        draw epoch-loss and epoch-auc plots
+        Have Errors, so noted now !
+        ====================================
+        '''
+         
+        '''
+        # Plot the figures per 50 epochs
+        fig1, ax1 = plt.subplots(figsize=(11, 8))
+
+        ax1.plot(epoches, GlossTr_list)
+        ax1.set_title("Average training Gloss vs epochs")
+        ax1.set_xlabel("Epochs")
+        ax1.set_ylabel("Current Gloss")
+        print(args.save_dir)
+        plt.savefig(args.save_dir,"loss_vs_epochs.png")
+
+        plt.clf()
+
+        fig2, ax2 = plt.subplots(figsize=(11, 8))
+
+        ax2.plot(epoches, auc_val_list, label="Val auc")
+        ax2.set_title("Average AUC vs epochs")
+        ax2.set_xlabel("Epochs")
+        ax2.set_ylabel("Current AUC")
+        plt.legend(loc='lower right')
+
+        plt.savefig(args.save_dir + "auc_vs_epochs.png")
+
+        plt.close('all')
+        '''
 def compute_loss(outputs,images,criterion):
     gen_imag, latent_i, latent_o = outputs
     loss_con = loss.l2_loss(images, gen_imag)
@@ -182,7 +224,7 @@ def get_args():
     parser.add_argument('-model','--model',help='ganomaly | skip-ganomaly | skip-attention-ganomaly ',default='skip-ganomaly')
     parser.add_argument('-imgdir','--img-dir',help='folder | cifar10 | mnist ',default='cifar10')
     #parser.add_argument('-imgdir','--img-dir',help='folder | cifar10 | mnist ',default=r"C:\factory_data\2022-12-30\crops_line")
-    parser.add_argument('--abnormal_class', default='airplane', help='Normal class idx for mnist and cifar datasets')
+    parser.add_argument('--abnormal_class', default='7', help='Normal class idx for mnist and cifar datasets')
     parser.add_argument('-imgtestdir','--img-testdir',help='val dataset',default=r"C:\factory_data\2022-12-30\crops_2cls")
     parser.add_argument('-imgsize','--img-size',type=int,help='image size',default=32)
     parser.add_argument('-nz','--nz',type=int,help='compress length',default=100)
@@ -190,7 +232,7 @@ def get_args():
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"./runs/train/2023-01-23/32-nz100-ngf64-ndf64-skip_ganomaly-cifar10")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"./runs/train/2023-04-22/mnist/")
     parser.add_argument('-weights','--weights',help='save model dir',default=r"")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=20)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
