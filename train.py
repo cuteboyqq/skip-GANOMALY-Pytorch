@@ -79,6 +79,18 @@ def train_epochs(model,train_loader,test_loader,args):
     SAVE_BEST_MODEL_G_PATH = os.path.join(args.save_dir,"best_netG.pt")
     SAVE_BEST_MODEL_D_PATH = os.path.join(args.save_dir,"best_netD.pt")
     
+    
+    #====add log file==================
+    logFileLoc = args.save_dir + args.logfile
+    if os.path.isfile(logFileLoc):
+        logger = open(logFileLoc, 'a')
+    else:
+        logger = open(logFileLoc, 'w')
+        logger.write("model: %s \n nz: %d \n nc: %d \n lr: %f" % (args.model, args.nz, args.nc, args.lr))
+        logger.write("\n%s\t\t%s\t\t%s\t\t%s\t\t%s" % ('Epoch', 'DLoss', 'GLoss', 'auc (val)', 'lr'))
+    logger.flush()
+    
+    
     for epoch in range(1, args.epoch+1):
         train_loss = 0.0
         G_loss = 0
@@ -130,6 +142,10 @@ def train_epochs(model,train_loader,test_loader,args):
         auc = model.test(test_loader)
         print('auc = {:.6f}'.format(auc))
         
+        #====write to log.txt====
+        logger.write("\n%d\t\t%.4f\t\t%.4f\t\t%.4f\t\t%.7f" % (epoch, avg_g_loss, avg_d_loss, auc, args.lr))
+        logger.flush()
+        
         if auc >= _highest_auc and epoch>1:
             _highest_auc = auc
             torch.save(model_g.state_dict(), SAVE_BEST_MODEL_G_PATH)
@@ -174,10 +190,11 @@ def get_args():
     parser.add_argument('-lr','--lr',type=float,help='learning rate',default=2e-4)
     parser.add_argument('-batchsize','--batch-size',type=int,help='train batch size',default=64)
     parser.add_argument('-testbatchsize','--test_batchsize',type=int,help='test batch size',default=64)
-    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"C:/GitHub_Code/cuteboyqq/GANomaly/skip-GANOMALY-Pytorch/runs/train/2023-01-23/32-nz100-ngf64-ndf64-skip_ganomaly-cifar10")
+    parser.add_argument('-savedir','--save-dir',help='save model dir',default=r"./runs/train/2023-01-23/32-nz100-ngf64-ndf64-skip_ganomaly-cifar10")
     parser.add_argument('-weights','--weights',help='save model dir',default=r"")
     parser.add_argument('-epoch','--epoch',type=int,help='num of epochs',default=20)
     parser.add_argument('-train','--train',type=bool,help='train model',default=True)
+    parser.add_argument('-logfile','--logfile',help='log file',default='log.txt')
     return parser.parse_args()    
 
 if __name__=="__main__":
